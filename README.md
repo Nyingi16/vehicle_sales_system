@@ -1,6 +1,3 @@
-Here is your **README.md file** ready to copy and save as `README.md`:
-
-```markdown
 # 🏎️ DriveSelect AI - Installation Guide
 
 DriveSelect AI is an elite automotive sales platform featuring AI-driven vehicle recommendations and an intelligent OpenAI-powered assistant.
