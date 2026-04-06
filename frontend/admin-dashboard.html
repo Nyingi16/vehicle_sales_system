@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | DriveSelect AI</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --accent-blue: #3b82f6;
+            --text-gray: #94a3b8;
+            --success-green: #10b981;
+            --danger-red: #ef4444;
+            --warning-yellow: #f59e0b;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--dark-bg); color: white; margin: 0; }
+        nav { background: #1e293b; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; padding: 40px 5%; }
+        .admin-section { background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        input, select, textarea { background: #0f172a; border: 1px solid #334155; color: white; padding: 10px; border-radius: 6px; width: 100%; box-sizing: border-box; }
+        .btn { background: var(--accent-blue); color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; width: 100%; margin-top: 15px; transition: 0.3s; }
+        .btn:hover { transform: translateY(-2px); opacity: 0.9; }
+        .nav-links a { color: white; text-decoration: none; margin-left: 20px; font-size: 0.9rem; transition: 0.3s; }
+        .nav-links a:hover { color: var(--accent-blue); }
+        
+        /* Table Styles */
+        .table-container { overflow-x: auto; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        th { color: var(--text-gray); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        td { color: white; }
+        
+        /* Button Styles */
+        .btn-verify { background: var(--success-green); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.3s; }
+        .btn-verify:hover { background: #059669; transform: translateY(-1px); }
+        .btn-view { background: var(--accent-blue); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.3s; margin-right: 8px; }
+        .btn-view:hover { background: #2563eb; transform: translateY(-1px); }
+        
+        /* Status Badges */
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .status-pending { background: var(--warning-yellow); color: #000; }
+        .status-completed { background: var(--success-green); color: white; }
+        
+        /* Section Header */
+        .section-header { margin-bottom: 20px; }
+        .section-header h2 { margin: 0 0 8px 0; font-size: 1.5rem; }
+        .section-header p { color: var(--text-gray); margin: 0; }
+        .section-header i { color: var(--accent-blue); margin-right: 10px; }
+        
+        /* Loading Spinner */
+        .loading-spinner { text-align: center; padding: 40px; color: var(--text-gray); }
+        .loading-spinner i { font-size: 2rem; margin-bottom: 10px; }
+        
+        /* Empty State */
+        .empty-state { text-align: center; padding: 40px; color: var(--text-gray); }
+        .empty-state i { font-size: 3rem; margin-bottom: 15px; opacity: 0.5; }
+        
+        /* Alert Messages - Toast Style */
+        .alert { padding: 12px; border-radius: 6px; display: none; }
+        .alert-success { background: rgba(16, 185, 129, 0.2); border: 1px solid var(--success-green); color: var(--success-green); }
+        .alert-error { background: rgba(239, 68, 68, 0.2); border: 1px solid var(--danger-red); color: var(--danger-red); }
+        
+        /* Toast notification */
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border-left: 4px solid var(--success-green);
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        .toast-notification.error {
+            border-left-color: var(--danger-red);
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @media (max-width: 768px) {
+            .admin-grid { grid-template-columns: 1fr; }
+            .form-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body class="admin-body">
+    <nav>
+        <div class="logo"><h2>DriveSelect <span style="color: var(--accent-blue);">Admin</span></h2></div>
+        <div class="nav-links">
+            <a href="index.html"><i class="fas fa-store"></i> View Shop</a>
+            <a href="reports.html"><i class="fas fa-chart-line"></i> Reports</a>
+            <a href="manage_admins.html"><i class="fas fa-user-plus"></i> Manage Admins</a>
+            <button onclick="handleLogout()" style="background:transparent; color:#ef4444; border:none; cursor:pointer; margin-left:20px;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </nav>
+
+    <div class="container" style="padding: 0 5%;">
+        <header class="admin-header" style="margin-top: 30px;">
+            <h1 id="adminWelcome"><i class="fas fa-tachometer-alt"></i> Control Panel</h1>
+        </header>
+
+        <div class="admin-grid">
+            <section class="admin-section">
+                <h3><i class="fas fa-plus-circle"></i> Add New Vehicle to Stock</h3>
+                <form id="addVehicleForm">
+                    <div class="form-grid">
+                        <input type="text" id="add_make" placeholder="Make (e.g. Toyota)" required>
+                        <input type="text" id="add_model" placeholder="Model (e.g. Camry)" required>
+                        <input type="number" id="add_year" placeholder="Year" required>
+                        <input type="number" id="add_price" placeholder="Price (USD)" required>
+                        <input type="text" id="add_fuel" placeholder="Fuel Type (e.g. Petrol)">
+                        <input type="text" id="add_transmission" placeholder="Transmission">
+                        <input type="number" id="add_mileage" placeholder="Mileage">
+                        <input type="number" id="add_engine" placeholder="Engine Size" step="0.1">
+                        <input type="text" id="add_image_url" placeholder="Image URL" style="grid-column: span 2;">
+                    </div>
+                    <textarea id="add_description" placeholder="Vehicle Description" rows="3" style="margin-top:15px;"></textarea>
+                    <button type="submit" class="btn"><i class="fas fa-save"></i> Add Vehicle to Inventory</button>
+                </form>
+                <div id="addStatus" class="alert"></div>
+            </section>
+
+            <section class="admin-section">
+                <h3><i class="fas fa-chart-simple"></i> System Status</h3>
+                <div style="display: flex; gap: 10px; flex-direction: column;">
+                    <a href="reports.html" class="btn" style="text-align: center; background: #334155;">
+                        <i class="fas fa-chart-bar"></i> View Sales Reports
+                    </a>
+                    <a href="manage_admins.html" class="btn" style="text-align: center; background: #334155;">
+                        <i class="fas fa-user-shield"></i> Add Auxiliary Admins
+                    </a>
+                </div>
+                
+                <div id="reportContainer" style="margin-top: 20px; color: var(--text-gray);">
+                    <p><i class="fas fa-info-circle"></i> Select "Reports" from the menu to see detailed customer interactions.</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- Pending Cash Verifications Section -->
+        <section class="admin-section" style="margin-top: 20px;">
+            <div class="section-header">
+                <h2><i class="fas fa-money-bill-wave"></i> Pending Cash Verifications</h2>
+                <p>Confirm these payments to mark vehicles as SOLD.</p>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer ID</th>
+                            <th>Vehicle</th>
+                            <th>Amount</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminPendingPayments">
+                        <tr>
+                            <td colspan="5" style="text-align:center;">
+                                <div class="loading-spinner">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    <p>Loading pending verifications...</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        // DO NOT declare let currentUser here; it is defined in main.js
+        
+        // Show toast notification (non-blocking)
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast-notification ${type}`;
+            toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        // Load pending cash payments for verification
+        async function loadPendingPayments() {
+            const container = document.getElementById('adminPendingPayments');
+            if (!container) return;
+
+            // Ensure we have currentUser from main.js
+            if (!window.currentUser) {
+                const saved = localStorage.getItem('currentUser');
+                if (saved) window.currentUser = JSON.parse(saved);
+            }
+            
+            if (!window.currentUser || window.currentUser.role !== 'admin') {
+                container.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--danger-red);">Admin authentication required</td></tr>';
+                return;
+            }
+
+            try {
+                // Append user_id to query string to pass admin_required check in app.py
+                const response = await fetch(`${API_BASE_URL}/admin/purchases?user_id=${window.currentUser.id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    if (response.status === 403) throw new Error('Unauthorized: Admin access required');
+                    if (response.status === 401) throw new Error('Authentication failed');
+                    throw new Error(`Server responded with ${response.status}`);
+                }
+                
+                const purchases = await response.json();
+                
+                // Filter for pending manual/cash payments awaiting admin approval
+                const pendingPayments = purchases.filter(p => 
+                    p.payment_status === 'PENDING_ADMIN_APPROVAL'
+                );
+                
+                if (pendingPayments.length === 0) {
+                    container.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="text-align:center;">
+                                <div class="empty-state">
+                                    <i class="fas fa-check-circle"></i>
+                                    <p>No pending cash verifications</p>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                // Display pending payments
+                container.innerHTML = pendingPayments.map(purchase => `
+                    <tr data-purchase-id="${purchase.id}">
+                        <td><strong>#${purchase.id}</strong></td>
+                        <td>${purchase.user_id || 'N/A'}</td>
+                        <td>${purchase.vehicle_name || `Vehicle #${purchase.vehicle_id}`}</td>
+                        <td><strong style="color: var(--success-green);">$${Number(purchase.amount).toLocaleString()}</strong></td>
+                        <td>
+                            <button class="btn-verify" onclick="verifyCashPayment(${purchase.id})">
+                                <i class="fas fa-check"></i> Verify Payment
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading pending payments:', error);
+                container.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align:center;">
+                            <div class="empty-state">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <p>Error loading pending verifications</p>
+                                <small style="color: var(--danger-red);">${error.message}</small>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+        
+        // Verify cash payment and mark vehicle as sold - NO CONFIRMATION DIALOG
+        async function verifyCashPayment(purchaseId) {
+            if (!window.currentUser || window.currentUser.role !== 'admin') {
+                showToast("Admin authentication required!", 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/admin/verify-purchase/${purchaseId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        user_id: window.currentUser.id 
+                    })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    showToast("✅ Payment verified! Vehicle marked as SOLD.", 'success');
+                    await loadPendingPayments();
+                    // Refresh admin vehicles table if it exists
+                    if (typeof loadAdminVehicles === 'function') loadAdminVehicles();
+                } else {
+                    showToast("Verification failed: " + (result.error || "Unknown error"), 'error');
+                }
+            } catch (error) {
+                console.error("Verification failed:", error);
+                showToast("Server connection error: " + error.message, 'error');
+            }
+        }
+        
+        // View purchase details
+        async function viewPurchaseDetails(purchaseId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/admin/purchases?user_id=${window.currentUser.id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const purchases = await response.json();
+                const purchase = purchases.find(p => p.id === purchaseId);
+                
+                if (purchase) {
+                    const details = `📋 Purchase Details\n\nOrder ID: #${purchase.id}\nVehicle: ${purchase.vehicle_name || 'N/A'}\nCustomer ID: ${purchase.user_id || 'N/A'}\nAmount: $${Number(purchase.amount).toLocaleString()}\nPayment Method: ${purchase.payment_method === 'manual' ? 'Cash' : 'Stripe'}\nStatus: ${purchase.payment_status}\nCreated: ${new Date(purchase.created_at).toLocaleString()}`;
+                    alert(details);
+                } else {
+                    alert('Purchase details not found');
+                }
+            } catch (error) {
+                console.error('Error fetching purchase details:', error);
+                alert('Error loading purchase details');
+            }
+        }
+        
+        // Handle vehicle addition
+        async function handleAddVehicle(e) {
+            e.preventDefault();
+            
+            if (!window.currentUser || window.currentUser.role !== 'admin') {
+                showToast("Admin access required!", 'error');
+                return;
+            }
+            
+            const vehicleData = {
+                user_id: window.currentUser.id,
+                make: document.getElementById('add_make').value,
+                model: document.getElementById('add_model').value,
+                year: parseInt(document.getElementById('add_year').value),
+                price: parseFloat(document.getElementById('add_price').value),
+                image_url: document.getElementById('add_image_url').value,
+                mileage: parseInt(document.getElementById('add_mileage').value) || 0,
+                fuel_type: document.getElementById('add_fuel').value,
+                transmission: document.getElementById('add_transmission').value,
+                engine_size: parseFloat(document.getElementById('add_engine').value) || 0.0,
+                description: document.getElementById('add_description').value || ''
+            };
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
+            try {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+                
+                const response = await fetch(`${API_BASE_URL}/admin/add-vehicle?user_id=${window.currentUser.id}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(vehicleData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showToast('Vehicle added successfully!', 'success');
+                    e.target.reset();
+                } else {
+                    throw new Error(data.error || 'Failed to add vehicle');
+                }
+                
+            } catch (error) {
+                console.error('Admin Error:', error);
+                showToast(`Error adding vehicle: ${error.message}`, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+        
+        // Handle logout
+        function handleLogout() {
+            localStorage.removeItem('currentUser');
+            window.currentUser = null;
+            window.location.href = 'index.html';
+        }
+        
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Check if user is logged in and is admin
+            const savedUser = localStorage.getItem('currentUser');
+            if (!savedUser) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            window.currentUser = JSON.parse(savedUser);
+            
+            if (window.currentUser.role !== 'admin') {
+                showToast('Unauthorized access. Admin only.', 'error');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
+                return;
+            }
+            
+            // Update welcome message
+            const welcomeEl = document.getElementById('adminWelcome');
+            if (welcomeEl) {
+                welcomeEl.innerHTML = `<i class="fas fa-tachometer-alt"></i> Welcome, ${window.currentUser.username}`;
+            }
+            
+            // Load pending payments
+            await loadPendingPayments();
+            
+            // Setup form submission
+            const addVehicleForm = document.getElementById('addVehicleForm');
+            if (addVehicleForm) {
+                // Remove any existing listeners to prevent duplicates
+                addVehicleForm.removeEventListener('submit', handleAddVehicle);
+                addVehicleForm.addEventListener('submit', handleAddVehicle);
+            }
+            
+            // Refresh pending payments every 30 seconds
+            setInterval(loadPendingPayments, 30000);
+        });
+        
+        // Make functions globally accessible
+        window.verifyCashPayment = verifyCashPayment;
+        window.viewPurchaseDetails = viewPurchaseDetails;
+        window.handleLogout = handleLogout;
+        window.loadPendingPayments = loadPendingPayments;
+        window.handleAddVehicle = handleAddVehicle;
+        window.showToast = showToast;
+    </script>
+</body>
+</html>

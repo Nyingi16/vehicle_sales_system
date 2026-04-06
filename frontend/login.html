@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | DriveSelect AI</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dark-bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --accent-blue: #3b82f6;
+            --text-gray: #94a3b8;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            color: white;
+            background-color: var(--dark-bg);
+            background-image: 
+                linear-gradient(135deg, rgba(0,0,0,0.4) 25%, transparent 25%), 
+                linear-gradient(225deg, rgba(0,0,0,0.4) 25%, transparent 25%), 
+                linear-gradient(45deg, rgba(0,0,0,0.4) 25%, transparent 25%), 
+                linear-gradient(315deg, rgba(0,0,0,0.4) 25%, var(--dark-bg) 25%);
+            background-position: 40px 0, 40px 0, 0 0, 0 0;
+            background-size: 80px 80px;
+            background-repeat: repeat;
+        }
+
+        .login-container {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            padding: 40px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        h2 { 
+            font-weight: 800; 
+            font-size: 2rem; 
+            margin-bottom: 5px; 
+            color: white;
+        }
+        
+        h2 span { 
+            color: var(--accent-blue); 
+        }
+        
+        .subtitle { 
+            text-align: center; 
+            color: var(--text-gray); 
+            font-size: 0.9rem; 
+            margin-bottom: 30px; 
+        }
+
+        .form-group { 
+            margin-bottom: 20px; 
+            text-align: left;
+        }
+        
+        .form-group label { 
+            display: block; 
+            margin-bottom: 8px; 
+            color: var(--text-gray); 
+            font-size: 0.85rem; 
+            font-weight: 500;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: 0.3s;
+        }
+
+        input:focus { 
+            border-color: var(--accent-blue); 
+            outline: none; 
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); 
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent-blue);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 800;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-login:hover { 
+            transform: translateY(-2px); 
+            background: #2563eb; 
+        }
+
+        .forgot-password {
+            margin-top: 15px;
+            text-align: right;
+        }
+        
+        .forgot-password a {
+            color: var(--text-gray);
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .forgot-password a:hover {
+            color: var(--accent-blue);
+        }
+
+        .auth-footer { 
+            text-align: center; 
+            margin-top: 25px; 
+            color: var(--text-gray); 
+            font-size: 0.85rem; 
+        }
+        
+        .auth-footer a { 
+            color: var(--accent-blue); 
+            text-decoration: none; 
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Drive<span>Select</span></h2>
+        <p class="subtitle">Precision Vehicle Systems Login</p>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Username or Email</label>
+                <input type="text" id="username" name="username" required placeholder="Enter your username or email">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required placeholder="••••••••">
+            </div>
+            
+            <!-- Forgot Password Link -->
+            <div class="forgot-password">
+                <a href="forgot-password.html">Forgot Password?</a>
+            </div>
+            
+            <button type="submit" class="btn-login">Secure Login</button>
+        </form>
+        
+        <p class="auth-footer">
+            New to the fleet? <a href="register.html">Create Account</a>
+        </p>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5001/api';
+
+        document.getElementById('loginForm').onsubmit = async (e) => {
+            e.preventDefault();
+            
+            // Getting the actual values from the inputs
+            const loginId = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        username: loginId, 
+                        password: password 
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Save the user data to localStorage
+                    localStorage.setItem('currentUser', JSON.stringify(result.user));
+                    
+                    // Show success message
+                    alert(`Welcome ${result.user.username}! Login successful.`);
+                    
+                    // Redirect based on user role
+                    if (result.user.role === 'admin') {
+                        window.location.href = 'admin-dashboard.html';
+                    } else {
+                        window.location.href = 'index.html';
+                    }
+                } else {
+                    alert("Login failed: " + (result.error || "Invalid credentials"));
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert("Cannot connect to server. Please make sure the application is running on port 5001.");
+            }
+        };
+
+        // Check if user is already logged in
+        window.onload = function() {
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) {
+                const user = JSON.parse(currentUser);
+                if (confirm(`You are already logged in as ${user.username}. Do you want to logout?`)) {
+                    localStorage.removeItem('currentUser');
+                } else {
+                    // Redirect based on role
+                    if (user.role === 'admin') {
+                        window.location.href = 'admin-dashboard.html';
+                    } else {
+                        window.location.href = 'index.html';
+                    }
+                }
+            }
+        };
+    </script>
+</body>
+</html>

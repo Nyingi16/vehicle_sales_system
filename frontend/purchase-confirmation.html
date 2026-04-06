@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders | DriveSelect AI</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --accent-blue: #3b82f6;
+            --text-gray: #94a3b8;
+            --success-green: #10b981;
+            --pending-orange: #f59e0b;
+            --danger-red: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark-bg);
+            color: white;
+            min-height: 100vh;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: -1px;
+            cursor: pointer;
+        }
+
+        .logo span {
+            color: var(--accent-blue);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-blue);
+        }
+
+        .login-btn {
+            background: var(--accent-blue);
+            padding: 8px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            color: white !important;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 5%;
+        }
+
+        /* Header Section */
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-section h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-section h1 i {
+            color: var(--accent-blue);
+            font-size: 2rem;
+        }
+
+        .btn-back {
+            background: var(--card-bg);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .btn-back:hover {
+            background: var(--accent-blue);
+            transform: translateY(-2px);
+            border-color: var(--accent-blue);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-blue);
+        }
+
+        .stat-card h3 {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: white;
+        }
+
+        .stat-value i {
+            color: var(--accent-blue);
+            font-size: 1.5rem;
+            margin-right: 8px;
+        }
+
+        /* Orders Grid */
+        .orders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 24px;
+        }
+
+        .order-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .order-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-blue);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);
+        }
+
+        .order-header {
+            background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(59,130,246,0.05) 100%);
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .order-id {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--accent-blue);
+        }
+
+        .order-id i {
+            margin-right: 6px;
+        }
+
+        .order-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-completed {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success-green);
+            border: 1px solid var(--success-green);
+        }
+
+        .status-pending {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--pending-orange);
+            border: 1px solid var(--pending-orange);
+        }
+
+        .status-failed {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger-red);
+            border: 1px solid var(--danger-red);
+        }
+
+        .order-body {
+            padding: 20px;
+        }
+
+        .vehicle-info {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .vehicle-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            background: var(--dark-bg);
+        }
+
+        .vehicle-details h3 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .vehicle-details p {
+            color: var(--text-gray);
+            font-size: 0.85rem;
+            margin: 3px 0;
+        }
+
+        .order-meta {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 15px;
+            margin-top: 10px;
+        }
+
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .meta-label {
+            color: var(--text-gray);
+        }
+
+        .meta-value {
+            font-weight: 600;
+            color: white;
+        }
+
+        .amount {
+            font-size: 1.2rem;
+            color: var(--accent-blue);
+            font-weight: 800;
+        }
+
+        .order-footer {
+            padding: 15px 20px;
+            background: rgba(0,0,0,0.2);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-details {
+            background: transparent;
+            color: var(--accent-blue);
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: 0.3s;
+            border: 1px solid var(--accent-blue);
+        }
+
+        .btn-details:hover {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        /* Loading State */
+        .loading-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-gray);
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(59,130,246,0.3);
+            border-top-color: var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-gray);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .empty-state p {
+            margin-bottom: 20px;
+        }
+
+        .btn-shop {
+            display: inline-block;
+            background: var(--accent-blue);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .btn-shop:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59,130,246,0.4);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-section {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .orders-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo" onclick="window.location.href='index.html'">DRIVE<span>SELECT</span></div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="search.html">Inventory</a></li>
+            <li id="adminNavigation" style="display:none;"><a href="admin-dashboard.html" style="color: var(--accent-blue);">Dashboard</a></li>
+            <li><a href="cart.html">Cart (<span id="cartCount">0</span>)</a></li>
+            <li id="authLinkContainer">
+                <a href="login.html" class="login-btn" id="userMenuLabel">Login</a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="header-section">
+            <h1>
+                <i class="fas fa-shopping-bag"></i>
+                My Orders
+            </h1>
+            <a href="index.html" class="btn-back">
+                <i class="fas fa-arrow-left"></i>
+                Back to Gallery
+            </a>
+        </div>
+
+        <div id="ordersList">
+            <div class="loading-state">
+                <div class="loading-spinner"></div>
+                <p>Loading your purchase history...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        
+        let allPurchases = [];
+
+        // Load user purchases
+        async function loadUserPurchases() {
+            const container = document.getElementById('ordersList');
+            
+            if (!currentUser) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-lock"></i>
+                        <h3>Authentication Required</h3>
+                        <p>Please log in to view your purchase history.</p>
+                        <a href="login.html" class="btn-shop">Login Now</a>
+                    </div>
+                `;
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/purchases/user/${currentUser.id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch purchases');
+                }
+
+                const purchases = await response.json();
+                allPurchases = purchases;
+
+                if (purchases.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-shopping-cart"></i>
+                            <h3>No Orders Yet</h3>
+                            <p>You haven't made any purchases yet. Start exploring our premium vehicles!</p>
+                            <a href="search.html" class="btn-shop">Browse Vehicles</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Calculate statistics
+                const totalSpent = purchases.reduce((sum, p) => sum + p.amount, 0);
+                const completedPurchases = purchases.filter(p => p.payment_status === 'completed').length;
+                const pendingPurchases = purchases.filter(p => p.payment_status === 'pending').length;
+
+                // Display statistics
+                const statsHtml = `
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3><i class="fas fa-chart-line"></i> Total Orders</h3>
+                            <div class="stat-value">${purchases.length}</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3><i class="fas fa-check-circle"></i> Completed</h3>
+                            <div class="stat-value">${completedPurchases}</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3><i class="fas fa-clock"></i> Pending</h3>
+                            <div class="stat-value">${pendingPurchases}</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3><i class="fas fa-dollar-sign"></i> Total Spent</h3>
+                            <div class="stat-value">$${totalSpent.toLocaleString()}</div>
+                        </div>
+                    </div>
+                `;
+
+                // Display orders
+                const ordersHtml = purchases.map(purchase => `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <span class="order-id">
+                                <i class="fas fa-receipt"></i> #${purchase.id}
+                            </span>
+                            <span class="order-status status-${purchase.payment_status}">
+                                <i class="fas ${purchase.payment_status === 'completed' ? 'fa-check-circle' : 'fa-clock'}"></i>
+                                ${purchase.payment_status === 'completed' ? 'Completed' : 'Pending'}
+                            </span>
+                        </div>
+                        <div class="order-body">
+                            <div class="vehicle-info">
+                                <img src="${purchase.vehicle?.image_url || 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=500'}" 
+                                     alt="${purchase.vehicle?.make} ${purchase.vehicle?.model}" 
+                                     class="vehicle-image">
+                                <div class="vehicle-details">
+                                    <h3>${purchase.vehicle?.year || 'N/A'} ${purchase.vehicle?.make || 'Unknown'} ${purchase.vehicle?.model || 'Vehicle'}</h3>
+                                    <p><i class="fas fa-tachometer-alt"></i> ${purchase.vehicle?.mileage?.toLocaleString() || 'N/A'} miles</p>
+                                    <p><i class="fas fa-gas-pump"></i> ${purchase.vehicle?.fuel_type || 'N/A'}</p>
+                                </div>
+                            </div>
+                            <div class="order-meta">
+                                <div class="meta-row">
+                                    <span class="meta-label"><i class="fas fa-calendar"></i> Order Date:</span>
+                                    <span class="meta-value">${new Date(purchase.created_at).toLocaleDateString()}</span>
+                                </div>
+                                <div class="meta-row">
+                                    <span class="meta-label"><i class="fas fa-credit-card"></i> Payment Method:</span>
+                                    <span class="meta-value">${purchase.payment_method === 'stripe' ? 'Card Payment' : 'Cash Payment'}</span>
+                                </div>
+                                <div class="meta-row">
+                                    <span class="meta-label"><i class="fas fa-dollar-sign"></i> Amount:</span>
+                                    <span class="meta-value amount">$${purchase.amount.toLocaleString()}</span>
+                                </div>
+                                ${purchase.verification_date && purchase.payment_method === 'manual' ? `
+                                <div class="meta-row">
+                                    <span class="meta-label"><i class="fas fa-check-circle"></i> Verified On:</span>
+                                    <span class="meta-value">${new Date(purchase.verification_date).toLocaleDateString()}</span>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                        <div class="order-footer">
+                            <a href="vehicle-details.html?id=${purchase.vehicle_id}" class="btn-details">
+                                <i class="fas fa-car"></i> View Vehicle
+                            </a>
+                        </div>
+                    </div>
+                `).join('');
+
+                container.innerHTML = statsHtml + '<div class="orders-grid">' + ordersHtml + '</div>';
+
+            } catch (error) {
+                console.error('Error loading purchases:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Error Loading Orders</h3>
+                        <p>Unable to load your purchase history. Please try again later.</p>
+                        <button onclick="location.reload()" class="btn-shop">Retry</button>
+                    </div>
+                `;
+            }
+        }
+
+        // Update UI based on user login status
+        function updateUIForLoggedInUser() {
+            const authLinkContainer = document.getElementById('authLinkContainer');
+            const adminNav = document.getElementById('adminNavigation');
+            const cartCount = document.getElementById('cartCount');
+
+            if (currentUser) {
+                if (authLinkContainer) {
+                    authLinkContainer.innerHTML = `
+                        <a href="#" class="login-btn" onclick="handleLogout()" style="background: #ef4444;">Logout</a>
+                    `;
+                }
+                if (adminNav && currentUser.role === 'admin') {
+                    adminNav.style.display = 'block';
+                }
+            } else {
+                if (authLinkContainer) {
+                    authLinkContainer.innerHTML = `<a href="login.html" class="login-btn">Login</a>`;
+                }
+                if (adminNav) adminNav.style.display = 'none';
+            }
+            
+            // Update cart count
+            if (cartCount) {
+                const savedCart = localStorage.getItem('cart');
+                const cart = savedCart ? JSON.parse(savedCart) : [];
+                cartCount.innerText = cart.length;
+            }
+        }
+
+        // Handle logout
+        function handleLogout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+            }
+            
+            updateUIForLoggedInUser();
+            loadUserPurchases();
+        });
+
+        // Make functions globally accessible
+        window.handleLogout = handleLogout;
+    </script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Garage | DriveSelect AI</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        :root {
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --accent-blue: #3b82f6;
+            --text-gray: #94a3b8;
+        }
+
+        body { font-family: 'Inter', sans-serif; background: var(--dark-bg); color: white; margin: 0; }
+        
+        .container { width: 90%; max-width: 1000px; margin: 50px auto; }
+        
+        .cart-layout { display: grid; grid-template-columns: 1fr 350px; gap: 40px; }
+
+        /* --- CART ITEMS --- */
+        .cart-item {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .cart-item img {
+            width: 120px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .item-info { flex-grow: 1; }
+        .item-info h4 { margin: 0; font-size: 1.1rem; }
+        .item-info p { color: var(--accent-blue); font-weight: 700; margin: 5px 0 0; }
+
+        .btn-remove {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* --- SUMMARY PANEL --- */
+        .summary-card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            height: fit-content;
+            border: 1px solid var(--accent-blue);
+            position: sticky;
+            top: 100px;
+        }
+
+        .total-price { font-size: 2rem; font-weight: 800; margin: 15px 0; }
+
+        .btn-checkout {
+            background: var(--accent-blue);
+            color: white;
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 850px) { .cart-layout { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="font-weight: 800; margin-bottom: 40px;">Your <span style="color: var(--accent-blue);">Garage</span></h1>
+        
+        <div class="cart-layout">
+            <div id="cartItemsContainer">
+                </div>
+
+            <div id="cartSummary" class="summary-card">
+                <h3 style="margin-top:0;">Order Summary</h3>
+                <p style="color: var(--text-gray); margin-bottom: 0;">Grand Total</p>
+                <div class="total-price" id="totalPrice">$0</div>
+                <button class="btn-checkout" onclick="checkout()">Proceed to Secure Checkout</button>
+                <button onclick="clearCart()" style="background:transparent; color: var(--text-gray); border:none; width:100%; margin-top:15px; cursor:pointer;">Clear All Items</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCartPage();
+            if (typeof updateUIForLoggedInUser === 'function') updateUIForLoggedInUser();
+        });
+
+        function renderCartPage() {
+            const container = document.getElementById('cartItemsContainer');
+            const summary = document.getElementById('cartSummary');
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            
+            if (cart.length === 0) {
+                container.innerHTML = `<div style="padding: 50px; text-align: center; background: var(--card-bg); border-radius:12px;">
+                    <p style="color: var(--text-gray);">Your garage is empty.</p>
+                    <a href="index.html" style="color: var(--accent-blue); text-decoration: none; font-weight: 600;">Browse Inventory →</a>
+                </div>`;
+                summary.style.display = 'none';
+                return;
+            }
+
+            summary.style.display = 'block';
+            let total = 0;
+            
+            container.innerHTML = cart.map((item, index) => {
+                total += parseFloat(item.price);
+                return `
+                    <div class="cart-item">
+                        <img src="${item.image_url || 'https://via.placeholder.com/150'}" alt="${item.make}">
+                        <div class="item-info">
+                            <h4>${item.year} ${item.make} ${item.model}</h4>
+                            <p>$${Number(item.price).toLocaleString()}</p>
+                        </div>
+                        <button class="btn-remove" onclick="removeFromCart(${index})">Remove</button>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('totalPrice').innerText = `$${total.toLocaleString()}`;
+        }
+
+        function removeFromCart(index) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            cart.splice(index, 1);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            renderCartPage();
+            if (typeof updateCartUI === 'function') updateCartUI();
+        }
+
+        function clearCart() {
+            localStorage.setItem('cart', JSON.stringify([]));
+            renderCartPage();
+            if (typeof updateCartUI === 'function') updateCartUI();
+        }
+    </script>
+</body>
+</html>

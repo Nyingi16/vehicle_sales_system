@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Add New Stock</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">Admin Dashboard</div>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="reports.html">Reports</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="auth-container">
+            <h2>Add New Vehicle to Inventory</h2>
+            <form id="addVehicleForm" class="auth-form">
+                <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <input type="text" id="add_make" placeholder="Make (e.g. Toyota)" required>
+                    <input type="text" id="add_model" placeholder="Model (e.g. Camry)" required>
+                    <input type="number" id="add_year" placeholder="Year" required>
+                    <input type="number" id="add_price" placeholder="Price" step="0.01" required>
+                    <input type="number" id="add_mileage" placeholder="Mileage">
+                    <input type="text" id="add_fuel" placeholder="Fuel Type">
+                    <input type="text" id="add_transmission" placeholder="Transmission">
+                    <input type="number" id="add_engine" placeholder="Engine Size (e.g. 2.5)" step="0.1">
+                </div>
+                <textarea id="add_description" placeholder="Vehicle Description" style="width: 100%; margin-top: 15px;"></textarea>
+                <button type="submit" class="btn" style="margin-top: 20px; width: 100%;">Add Vehicle to Stock</button>
+            </form>
+            <div class="form-group">
+    <label>Vehicle Image URL</label>
+    <input type="text" id="add_image_url" placeholder="https://example.com/car-image.jpg">
+</div>
+            <div id="addStatus"></div>
+        </section>
+    </main>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Restrict page access immediately on the frontend
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if (!user || user.role !== 'admin') {
+                alert("Access Denied: Admins Only.");
+                window.location.href = 'index.html';
+            }
+        });
+
+        document.getElementById('addVehicleForm').addEventListener('submit', handleAddVehicle);
+    </script>
+</body>
+</html>

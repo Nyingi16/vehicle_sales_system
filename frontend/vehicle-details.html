@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Details | DriveSelect AI</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        .details-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 5%;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 40px;
+        }
+        .vehicle-gallery img {
+            width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .info-card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .price-tag {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent-blue);
+            margin: 10px 0;
+        }
+        .tax-info {
+            background: rgba(59, 130, 246, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 0.9rem;
+            border-left: 4px solid var(--accent-blue);
+        }
+        .spec-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        .spec-item {
+            background: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: 6px;
+        }
+        .spec-label { color: var(--text-gray); font-size: 0.8rem; display: block; }
+        .btn-buy-now {
+            width: 100%;
+            padding: 15px;
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+        .btn-buy-now:hover { transform: translateY(-3px); }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo" onclick="window.location.href='index.html'" style="cursor:pointer">DRIVESELECT <span style="color:var(--accent-blue)">AI</span></div>
+        <div id="userMenu"></div>
+    </nav>
+
+    <div id="detailsContent" class="details-container">
+        <p>Loading vehicle information...</p>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Get ID from URL: vehicle-details.html?id=5
+            const urlParams = new URLSearchParams(window.location.search);
+            const vehicleId = urlParams.get('id');
+            
+            if (vehicleId) {
+                fetchVehicleDetails(vehicleId);
+            } else {
+                window.location.href = 'inventory.html';
+            }
+        });
+
+        async function fetchVehicleDetails(id) {
+            try {
+                // Fetch specific vehicle from your existing Flask endpoint
+                const response = await fetch(`${API_BASE_URL}/recommendations`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ preferences: {} }) // Simple fetch all
+                });
+                const data = await response.json();
+                const vehicle = data.recommendations.find(v => v.id == id);
+
+                if (!vehicle) {
+                    document.getElementById('detailsContent').innerHTML = "<h2>Vehicle not found</h2>";
+                    return;
+                }
+
+                renderDetails(vehicle);
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        }
+
+        function renderDetails(v) {
+            // Simple tax calculation (e.g., 5% estimate)
+            const tax = v.price * 0.05;
+            const total = parseFloat(v.price) + tax;
+
+            document.getElementById('detailsContent').innerHTML = `
+                <div class="vehicle-gallery">
+                    <img src="${v.image_url || 'https://via.placeholder.com/800x500'}" alt="${v.make}">
+                    <div style="margin-top:20px;">
+                        <h3>Description & Features</h3>
+                        <p style="color:var(--text-gray); line-height:1.6;">
+                            This ${v.year} ${v.make} ${v.model} is a premium ${v.body_type} featuring ${v.fuel_type} efficiency and a ${v.transmission} gearbox. 
+                            ${v.features ? `Equipped with: ${v.features}` : 'Features include advanced safety systems and luxury interior.'}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <span class="status-badge" style="background:${v.status === 'available' ? '#10b981' : '#ef4444'}22; color:${v.status === 'available' ? '#10b981' : '#ef4444'}">
+                        ${v.status.toUpperCase()}
+                    </span>
+                    <h1 style="margin:10px 0;">${v.year} ${v.make} ${v.model}</h1>
+                    <div class="price-tag">$${Number(v.price).toLocaleString()}</div>
+                    
+                    <div class="tax-info">
+                        <div style="display:flex; justify-content:space-between">
+                            <span>Base Price:</span> <span>$${Number(v.price).toLocaleString()}</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-top:5px;">
+                            <span>Est. Sales Tax (5%):</span> <span>$${tax.toLocaleString()}</span>
+                        </div>
+                        <hr style="opacity:0.1; margin:10px 0;">
+                        <div style="display:flex; justify-content:space-between; font-weight:bold; color:white">
+                            <span>Total Price:</span> <span>$${total.toLocaleString()}</span>
+                        </div>
+                    </div>
+
+                    <div class="spec-grid">
+                        <div class="spec-item"><span class="spec-label">Body Style</span><strong>${v.body_type}</strong></div>
+                        <div class="spec-item"><span class="spec-label">Fuel Type</span><strong>${v.fuel_type}</strong></div>
+                        <div class="spec-item"><span class="spec-label">Mileage</span><strong>${Number(v.mileage).toLocaleString()} mi</strong></div>
+                        <div class="spec-item"><span class="spec-label">Transmission</span><strong>${v.transmission}</strong></div>
+                    </div>
+
+                    ${v.status === 'available' ? 
+                        `<button class="btn-buy-now" onclick="initiatePurchase(${v.id}, 'stripe')">Proceed to Checkout</button>
+                         <button class="btn-buy-now" style="background:#10b981; margin-top:10px;" onclick="initiatePurchase(${v.id}, 'manual')">Pay with Cash</button>` 
+                        : '<button class="btn-buy-now" style="background:#334155" disabled>Sold Out</button>'
+                    }
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory | DriveSelect AI</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --accent-blue: #3b82f6;
+            --text-gray: #94a3b8;
+            --glass: rgba(15, 23, 42, 0.9);
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--dark-bg); 
+            color: white; 
+            margin: 0;
+        }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            position: sticky; top: 0; z-index: 1000;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex; justify-content: space-between;
+            align-items: center; padding: 1rem 5%;
+        }
+        .logo { font-weight: 800; font-size: 1.5rem; letter-spacing: -1px; cursor: pointer; }
+        .logo span { color: var(--accent-blue); }
+        .nav-links { display: flex; align-items: center; gap: 2rem; list-style: none; margin: 0; padding: 0; }
+        .nav-links a { text-decoration: none; color: white; font-weight: 500; font-size: 0.9rem; transition: 0.3s; cursor: pointer; }
+
+        /* --- HEADER --- */
+        .inventory-header {
+            padding: 60px 5% 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .btn-advanced-search {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent-blue);
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            border: 1px solid var(--accent-blue);
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .btn-advanced-search:hover {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        /* --- GRID --- */
+        .inventory-section { padding: 20px 5% 60px; max-width: 1400px; margin: 0 auto; }
+        #recommendationsContainer { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+            gap: 30px; 
+        }
+
+        /* --- PAGINATION --- */
+        .pagination-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 50px;
+            padding-bottom: 60px;
+        }
+
+        .page-btn {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: 600;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+        .page-btn.active {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .inventory-header { flex-direction: column; align-items: flex-start; gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo" onclick="window.location.href='index.html'">DRIVE<span>SELECT</span></div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="inventory.html" style="color: var(--accent-blue);">Inventory</a></li>
+            <li><a href="cart.html">Cart (<span id="cartCount">0</span>)</a></li>
+            <li id="authLinkContainer"></li>
+        </ul>
+    </nav>
+
+    <header class="inventory-header">
+        <div>
+            <h1 style="font-size: 2.5rem; font-weight: 800; margin: 0;">Showroom <span style="color: var(--accent-blue);">Inventory</span></h1>
+            <p style="color: var(--text-gray); margin-top: 10px;">Explore our curated collection of high-performance vehicles.</p>
+        </div>
+        <a href="search.html" class="btn-advanced-search">Advanced AI Search →</a>
+    </header>
+
+    <main class="inventory-section">
+        <div id="recommendationsContainer">
+            <div style="grid-column: 1/-1; text-align: center; padding: 100px;">
+                <p style="color: var(--text-gray);">Syncing with DriveSelect Database...</p>
+            </div>
+        </div>
+
+        <div id="paginationControls" class="pagination-wrapper">
+            </div>
+    </main>
+
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Update Auth UI
+            if (typeof updateUIForLoggedInUser === 'function') updateUIForLoggedInUser();
+            
+            // Set pagination limit to 10 for this specific page
+            window.itemsPerPage = 10;
+            
+            // Initial Load
+            loadAvailableStock();
+        });
+
+        // Function to handle rendering the specific grid items for this page
+        // (This works in sync with the logic added to your main.js)
+        function renderInventoryGrid(pagedVehicles) {
+            const container = document.getElementById('recommendationsContainer');
+            container.innerHTML = pagedVehicles.map(v => `
+                <div class="vehicle-card" onclick="viewVehicleDetails(${v.id})">
+                    <img src="${v.image_url || 'https://via.placeholder.com/400x250'}" alt="${v.make}">
+                    <div class="card-meta">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <h4>${v.year} ${v.make} ${v.model}</h4>
+                        </div>
+                        <p class="price">$${Number(v.price).toLocaleString()}</p>
+                        <p class="specs">${v.fuel_type} • ${v.transmission} • ${v.mileage.toLocaleString()} mi</p>
+                        <button class="btn-buy" onclick="event.stopPropagation(); addToCart(${JSON.stringify(v).replace(/"/g, '&quot;')})">Add to Cart</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>

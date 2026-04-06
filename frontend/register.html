@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | DriveSelect AI</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dark-bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --accent-blue: #3b82f6;
+            --text-gray: #94a3b8;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            color: white;
+            background-color: var(--dark-bg);
+            background-image: 
+                linear-gradient(135deg, rgba(0,0,0,0.4) 25%, transparent 25%), 
+                linear-gradient(225deg, rgba(0,0,0,0.4) 25%, transparent 25%), 
+                linear-gradient(45deg, rgba(0,0,0,0.4) 25%, transparent 25%), 
+                linear-gradient(315deg, rgba(0,0,0,0.4) 25%, var(--dark-bg) 25%);
+            background-position: 40px 0, 40px 0, 0 0, 0 0;
+            background-size: 80px 80px;
+            background-repeat: repeat;
+        }
+
+        .register-container {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            padding: 40px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+        }
+
+        h2 { 
+            font-weight: 800; 
+            text-align: center; 
+            margin: 0; 
+            font-size: 2rem;
+        }
+        
+        h2 span { 
+            color: var(--accent-blue); 
+        }
+
+        .subtitle {
+            text-align: center; 
+            color: var(--text-gray); 
+            font-size: 0.9rem; 
+            margin-top: 5px;
+            margin-bottom: 25px;
+        }
+
+        .form-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 15px; 
+            margin-top: 10px; 
+        }
+        
+        .full-width { 
+            grid-column: span 2; 
+        }
+
+        .form-group label { 
+            display: block; 
+            margin-bottom: 8px; 
+            color: var(--text-gray); 
+            font-size: 0.85rem; 
+            font-weight: 500; 
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--accent-blue);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        .btn-reg {
+            width: 100%;
+            padding: 15px;
+            background: var(--accent-blue);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 800;
+            font-size: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-reg:hover { 
+            background: #2563eb; 
+            transform: translateY(-2px); 
+        }
+
+        .footer-text { 
+            text-align: center; 
+            margin-top: 25px; 
+            font-size: 0.9rem; 
+            color: var(--text-gray); 
+        }
+        
+        .footer-text a { 
+            color: var(--accent-blue); 
+            text-decoration: none; 
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        
+        .footer-text a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <h2>Join <span>DriveSelect</span></h2>
+        <p class="subtitle">Register for precision inventory access</p>
+
+        <form id="registerForm" class="form-grid">
+            <div class="form-group full-width">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required placeholder="Choose a username">
+            </div>
+
+            <div class="form-group full-width">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required placeholder="email@example.com">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required placeholder="Minimum 8 characters">
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="text" id="phone" name="phone" placeholder="+254...">
+            </div>
+
+            <button type="submit" class="btn-reg full-width">Initialize Account</button>
+        </form>
+
+        <p class="footer-text">
+            Already have an account? <a href="login.html">Sign In</a>
+        </p>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Ensure handleRegistration function from main.js is used
+        document.getElementById('registerForm').addEventListener('submit', (e) => {
+            if (typeof handleRegistration === 'function') {
+                handleRegistration(e);
+            } else {
+                console.error("handleRegistration not found in main.js");
+                // Fallback registration handling
+                e.preventDefault();
+                
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData.entries());
+                data.role = 'customer';
+                
+                fetch('http://localhost:5001/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.user_id) {
+                        alert('Registration successful! Please log in.');
+                        window.location.href = 'login.html';
+                    } else {
+                        alert('Registration failed: ' + (result.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Registration error:', error);
+                    alert('Could not connect to server.');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

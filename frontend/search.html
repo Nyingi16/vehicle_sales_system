@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Inventory | DriveSelect AI</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --accent-blue: #3b82f6;
+            --text-gray: #94a3b8;
+            --glass: rgba(15, 23, 42, 0.8);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark-bg);
+            color: white;
+            margin: 0;
+        }
+
+        .navbar {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo { font-weight: 800; font-size: 1.5rem; letter-spacing: -1px; }
+        .logo span { color: var(--accent-blue); }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+
+        /* --- SEARCH CONSOLE --- */
+        .search-card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 50px;
+        }
+
+        .search-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        input, select {
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        input:focus { border-color: var(--accent-blue); outline: none; }
+
+        .btn-search {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        /* --- RESULTS GRID --- */
+        .inventory-container {
+            margin-bottom: 30px;
+        }
+
+        #recommendationsContainer {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        /* --- PAGINATION STYLES --- */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 40px;
+            margin-bottom: 60px;
+        }
+
+        .pagination-btn {
+            background: var(--card-bg);
+            border: 1px solid #334155;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-numbers {
+            display: flex;
+            gap: 8px;
+        }
+
+        .page-number {
+            background: var(--card-bg);
+            border: 1px solid #334155;
+            color: white;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .page-number:hover {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+
+        .page-number.active {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        @media (max-width: 1024px) { #recommendationsContainer { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 640px) { #recommendationsContainer { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">DRIVE<span>SELECT</span></div>
+        <div class="nav-links"><a href="index.html" style="color:white; text-decoration:none;">← Back to Home</a></div>
+    </nav>
+
+    <div class="container">
+        <header style="margin-bottom: 30px;">
+            <h1 style="font-weight: 800;">Find Your <span style="color: var(--accent-blue);">Perfect Match</span></h1>
+            <p style="color: var(--text-gray);">Advanced AI-driven inventory search</p>
+        </header>
+
+        <section class="search-card">
+            <form id="searchForm" class="search-grid">
+                <input type="text" id="make" placeholder="Make (e.g. Toyota)">
+                <input type="text" id="model" placeholder="Model (e.g. Camry)">
+                <input type="number" id="maxPrice" placeholder="Max Price (USD)">
+                <select id="fuelType">
+                    <option value="">All Fuel Types</option>
+                    <option value="Petrol">Petrol</option>
+                    <option value="Diesel">Diesel</option>
+                    <option value="Electric">Electric</option>
+                </select>
+                <select id="transmission">
+                    <option value="">Any Transmission</option>
+                    <option value="Automatic">Automatic</option>
+                    <option value="Manual">Manual</option>
+                </select>
+                <button type="submit" class="btn-search">Search Inventory</button>
+            </form>
+        </section>
+
+        <main class="inventory-container">
+            <div id="recommendationsContainer">
+                <!-- Results will be dynamically inserted here -->
+            </div>
+        </main>
+
+        <!-- Pagination section follows recommendationsContainer -->
+        <div class="pagination-container" id="paginationContainer">
+            <button class="pagination-btn" id="prevPage" disabled>Previous</button>
+            <div class="pagination-numbers" id="paginationNumbers">
+                <!-- Page numbers will be dynamically inserted here -->
+            </div>
+            <button class="pagination-btn" id="nextPage" disabled>Next</button>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
