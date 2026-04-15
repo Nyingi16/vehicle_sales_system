@@ -6,6 +6,7 @@
     <title>DriveSelect AI | Elite Automotive</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --dark-bg: #0f172a;
@@ -41,7 +42,7 @@
         .nav-links a { text-decoration: none; color: white; font-weight: 500; font-size: 0.9rem; transition: 0.3s; cursor: pointer; }
         .nav-links a:hover { color: var(--accent-blue); }
 
-        /* --- SEARCH DRAWER --- */
+        /* --- SEARCH DRAWER - QUICK SEARCH --- */
         #searchDrawer {
             display: none;
             background: var(--card-bg);
@@ -63,8 +64,154 @@
             margin: 0 auto;
         }
 
-        #searchDrawer input {
-            background: #0f172a; border: 1px solid #334155; color: white; padding: 12px; border-radius: 8px;
+        #searchDrawer input, #searchDrawer select {
+            background: #0f172a; 
+            border: 1px solid #334155; 
+            color: white; 
+            padding: 12px; 
+            border-radius: 8px;
+        }
+
+        .search-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-quick-search {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .btn-quick-search:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        .btn-advanced-search {
+            background: #334155;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-advanced-search:hover {
+            background: #475569;
+            transform: translateY(-2px);
+        }
+
+        /* Quick Results Section */
+        .quick-results-section {
+            padding: 40px 5%;
+            background: var(--dark-bg);
+            display: none;
+        }
+
+        .quick-results-section.visible {
+            display: block;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .section-header h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .clear-results-btn {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .clear-results-btn:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .quick-results-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+        }
+
+        .quick-result-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .quick-result-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-blue);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .quick-result-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .quick-result-info {
+            padding: 15px;
+        }
+
+        .quick-result-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .quick-result-price {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--accent-blue);
+            margin-bottom: 8px;
+        }
+
+        .quick-result-specs {
+            display: flex;
+            gap: 10px;
+            font-size: 0.7rem;
+            color: var(--text-gray);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-gray);
         }
 
         /* --- HERO SPOTLIGHT --- */
@@ -122,7 +269,6 @@
 
         .login-btn { background: var(--accent-blue); padding: 8px 24px; border-radius: 6px; font-weight: 600; color: white !important; }
         
-        /* Orders button style */
         .orders-btn { 
             background: var(--success-green); 
             padding: 8px 24px; 
@@ -187,11 +333,6 @@
             display: block;
         }
 
-        @media (max-width: 850px) { 
-            .spotlight-container { flex-direction: column; }
-            .nav-links { gap: 1rem; }
-        }
-
         /* Chat Widget Styles */
         #chat-container {
             position: fixed;
@@ -199,6 +340,7 @@
             right: 20px;
             z-index: 1000;
         }
+        
         #chat-toggle-btn {
             background: var(--accent-blue);
             color: white;
@@ -208,13 +350,23 @@
             cursor: pointer;
             font-weight: 600;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
         }
+        
+        #chat-toggle-btn:hover {
+            transform: scale(1.05);
+            background: #2563eb;
+        }
+        
         #chat-window {
             position: fixed;
             bottom: 80px;
             right: 20px;
-            width: 320px;
-            height: 400px;
+            width: 350px;
+            height: 450px;
             background: var(--card-bg);
             border-radius: 12px;
             border: 1px solid rgba(255,255,255,0.1);
@@ -222,27 +374,95 @@
             flex-direction: column;
             overflow: hidden;
             transition: 0.3s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
-        #chat-window.hidden {
-            display: none;
-        }
+        
+        #chat-window.hidden { display: none; }
+        
         #chat-header {
             background: var(--accent-blue);
             padding: 12px;
             font-weight: 600;
             text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
+        
+        #chat-header .chat-title { display: flex; align-items: center; gap: 8px; }
+        #close-chat { background: none; border: none; color: white; cursor: pointer; font-size: 1.2rem; }
+        
         #chat-messages {
             flex: 1;
             padding: 12px;
             overflow-y: auto;
             font-size: 0.85rem;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
+        
+        .message { margin-bottom: 8px; display: flex; animation: fadeIn 0.3s ease; }
+        .message.user { justify-content: flex-end; }
+        .message.bot { justify-content: flex-start; }
+        
+        .message-content {
+            max-width: 80%;
+            padding: 8px 12px;
+            border-radius: 12px;
+            line-height: 1.4;
+        }
+        
+        .message.user .message-content {
+            background: var(--accent-blue);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .message.bot .message-content {
+            background: #334155;
+            color: white;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
+            background: #334155;
+            border-radius: 12px;
+            width: fit-content;
+        }
+        
+        .typing-indicator span {
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+            30% { transform: translateY(-8px); opacity: 1; }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
         .chat-input-box {
             display: flex;
             padding: 10px;
             border-top: 1px solid rgba(255,255,255,0.1);
+            gap: 8px;
         }
+        
         .chat-input-box input {
             flex: 1;
             background: #0f172a;
@@ -250,28 +470,54 @@
             color: white;
             padding: 8px;
             border-radius: 6px;
+            outline: none;
         }
+        
+        .chat-input-box input:focus { border-color: var(--accent-blue); }
+        
         .chat-input-box button {
             background: var(--accent-blue);
             border: none;
             padding: 8px 16px;
             border-radius: 6px;
             color: white;
-            margin-left: 8px;
             cursor: pointer;
+            transition: 0.3s;
         }
-        .message {
-            margin-bottom: 10px;
+        
+        .chat-input-box button:hover { background: #2563eb; }
+        
+        .suggestions-container {
             padding: 8px;
-            border-radius: 8px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
         }
-        .message.user {
-            background: var(--accent-blue);
-            text-align: right;
+        
+        .suggestion-chip {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: 0.2s;
         }
-        .message.bot {
-            background: #334155;
-            text-align: left;
+        
+        .suggestion-chip:hover { background: var(--accent-blue); }
+
+        @media (max-width: 1200px) {
+            .quick-results-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 900px) {
+            .quick-results-grid { grid-template-columns: repeat(2, 1fr); }
+            .spotlight-container { flex-direction: column; }
+        }
+        @media (max-width: 600px) {
+            .quick-results-grid { grid-template-columns: 1fr; }
+            .nav-links { gap: 0.8rem; }
+            .search-actions { flex-direction: column; }
         }
     </style>
 </head>
@@ -282,9 +528,10 @@
         <ul class="nav-links">
             <li><a href="index.html">Home</a></li>
             <li><a href="inventory.html">Inventory</a></li>
-            <li><a onclick="toggleSearch()" id="searchToggle">Quick Search</a></li>
+            <li><a onclick="toggleSearch()" id="searchToggle"><i class="fas fa-search"></i> Quick Search</a></li>
+            <li><a href="search.html" id="advancedSearchLink"><i class="fas fa-sliders-h"></i> Advanced Search</a></li>
             <li id="adminNavigation" style="display:none;"><a href="admin-dashboard.html" style="color: var(--accent-blue);">Dashboard</a></li>
-            <li><a href="cart.html">Cart (<span id="cartCount">0</span>)</a></li>
+            <li><a href="cart.html"><i class="fas fa-shopping-cart"></i> Cart (<span id="cartCount">0</span>)</a></li>
             <li id="ordersNav" style="display:none;"><a href="purchase-confirmation.html" class="orders-btn">📋 My Orders</a></li>
             <li id="authLinkContainer">
                 <a href="login.html" class="login-btn" id="userMenuLabel">Login</a>
@@ -292,13 +539,44 @@
         </ul>
     </nav>
 
+    <!-- Quick Search Drawer -->
     <div id="searchDrawer">
-        <form id="searchForm" class="search-grid" onsubmit="event.preventDefault(); window.location.href='inventory.html';">
-            <input type="text" placeholder="Make">
-            <input type="text" placeholder="Model">
-            <input type="number" placeholder="Max Price">
-            <button type="submit" class="login-btn">Filter Stock</button>
+        <form id="quickSearchForm" class="search-grid">
+            <input type="text" id="quickMake" placeholder="Make (e.g. Toyota)">
+            <input type="text" id="quickModel" placeholder="Model (e.g. Camry)">
+            <select id="quickFuelType">
+                <option value="">All Fuel Types</option>
+                <option value="Petrol">⛽ Petrol</option>
+                <option value="Diesel">🛢️ Diesel</option>
+                <option value="Electric">⚡ Electric</option>
+            </select>
+            <select id="quickTransmission">
+                <option value="">Any Transmission</option>
+                <option value="Automatic">Automatic</option>
+                <option value="Manual">Manual</option>
+            </select>
+            <div class="search-actions">
+                <button type="submit" class="btn-quick-search">
+                    <i class="fas fa-search"></i> Quick Search
+                </button>
+                <button type="button" class="btn-advanced-search" onclick="goToAdvancedSearch()">
+                    <i class="fas fa-sliders-h"></i> Advanced Search
+                </button>
+            </div>
         </form>
+    </div>
+
+    <!-- Quick Results Section -->
+    <div class="quick-results-section" id="quickResultsSection">
+        <div class="section-header">
+            <h2><i class="fas fa-search"></i> Quick Search Results</h2>
+            <button class="clear-results-btn" onclick="clearQuickResults()">
+                <i class="fas fa-times"></i> Clear Results
+            </button>
+        </div>
+        <div class="quick-results-grid" id="quickResultsGrid">
+            <!-- Results will appear here -->
+        </div>
     </div>
 
     <section class="hero-spotlight">
@@ -314,41 +592,240 @@
 
     <script src="js/main.js"></script>
     <script>
-        // Global currentUser reference
+        // Global variables
         window.currentUser = null;
+        let allVehiclesData = [];
         
+        // Toggle search drawer
         function toggleSearch() {
             const drawer = document.getElementById('searchDrawer');
             drawer.style.display = (drawer.style.display === 'block') ? 'none' : 'block';
         }
         
+        // Go to advanced search page
+        function goToAdvancedSearch() {
+            window.location.href = 'search.html';
+        }
+        
+        // Load all vehicles for searching
+        async function loadAllVehicles() {
+            try {
+                const response = await fetch('http://localhost:5001/api/vehicles');
+                if (response.ok) {
+                    allVehiclesData = await response.json();
+                }
+            } catch (error) {
+                console.error('Error loading vehicles:', error);
+            }
+        }
+        
+        // Perform quick search
+        async function performQuickSearch(e) {
+            if (e) e.preventDefault();
+            
+            const make = document.getElementById('quickMake').value.toLowerCase();
+            const model = document.getElementById('quickModel').value.toLowerCase();
+            const fuelType = document.getElementById('quickFuelType').value;
+            const transmission = document.getElementById('quickTransmission').value;
+            
+            // Show loading state
+            const resultsGrid = document.getElementById('quickResultsGrid');
+            const resultsSection = document.getElementById('quickResultsSection');
+            resultsGrid.innerHTML = '<div class="no-results"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
+            resultsSection.classList.add('visible');
+            
+            // If vehicles not loaded yet, load them
+            if (allVehiclesData.length === 0) {
+                await loadAllVehicles();
+            }
+            
+            // Filter vehicles
+            let filtered = [...allVehiclesData];
+            
+            if (make) {
+                filtered = filtered.filter(v => v.make.toLowerCase().includes(make));
+            }
+            if (model) {
+                filtered = filtered.filter(v => v.model.toLowerCase().includes(model));
+            }
+            if (fuelType) {
+                filtered = filtered.filter(v => v.fuel_type === fuelType);
+            }
+            if (transmission) {
+                filtered = filtered.filter(v => v.transmission === transmission);
+            }
+            
+            // Display results
+            if (filtered.length === 0) {
+                resultsGrid.innerHTML = `
+                    <div class="no-results" style="grid-column: 1/-1;">
+                        <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                        <h3>No vehicles found</h3>
+                        <p>Try adjusting your search criteria or use <a href="search.html" style="color: var(--accent-blue);">Advanced Search</a> for more options.</p>
+                    </div>
+                `;
+            } else {
+                resultsGrid.innerHTML = filtered.map(vehicle => `
+                    <div class="quick-result-card" onclick="viewVehicleDetails(${vehicle.id})">
+                        <img src="${vehicle.image_url || 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=500'}" 
+                             alt="${vehicle.make} ${vehicle.model}" 
+                             class="quick-result-image"
+                             onerror="this.src='https://via.placeholder.com/400x250?text=Vehicle'">
+                        <div class="quick-result-info">
+                            <div class="quick-result-title">${vehicle.year} ${vehicle.make} ${vehicle.model}</div>
+                            <div class="quick-result-price">KSh ${vehicle.price.toLocaleString()}</div>
+                            <div class="quick-result-specs">
+                                <span><i class="fas fa-tachometer-alt"></i> ${(vehicle.mileage || 0).toLocaleString()} mi</span>
+                                <span><i class="fas fa-gas-pump"></i> ${vehicle.fuel_type || 'N/A'}</span>
+                                <span><i class="fas fa-cogs"></i> ${vehicle.transmission || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            // Scroll to results
+            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            // Close drawer
+            document.getElementById('searchDrawer').style.display = 'none';
+        }
+        
+        // Clear quick results
+        function clearQuickResults() {
+            const resultsSection = document.getElementById('quickResultsSection');
+            resultsSection.classList.remove('visible');
+            document.getElementById('quickResultsGrid').innerHTML = '';
+            // Reset form
+            document.getElementById('quickSearchForm').reset();
+        }
+        
+        // View vehicle details
+        function viewVehicleDetails(vehicleId) {
+            window.location.href = `vehicle-details.html?id=${vehicleId}`;
+        }
+        
+        // ============= CHATBOT FUNCTIONS =============
+        
         function toggleChat() {
             const chatWindow = document.getElementById('chat-window');
             chatWindow.classList.toggle('hidden');
+            if (!chatWindow.classList.contains('hidden')) {
+                loadSuggestions();
+            }
         }
         
-        function sendChatMessage() {
+        function closeChat() {
+            document.getElementById('chat-window').classList.add('hidden');
+        }
+        
+        async function loadSuggestions() {
+            try {
+                const response = await fetch('http://localhost:5001/api/chatbot/suggest');
+                const data = await response.json();
+                const container = document.getElementById('suggestionsContainer');
+                if (container && data.suggestions) {
+                    container.innerHTML = data.suggestions.slice(0, 4).map(s => 
+                        `<span class="suggestion-chip" onclick="sendSuggestion('${s.replace(/'/g, "\\'")}')">${s}</span>`
+                    ).join('');
+                }
+            } catch (error) {
+                console.error('Error loading suggestions:', error);
+            }
+        }
+        
+        function sendSuggestion(text) {
+            document.getElementById('chat-input').value = text;
+            sendChatMessage();
+        }
+        
+        function addTypingIndicator() {
+            const messagesContainer = document.getElementById('chat-messages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div>`;
+            messagesContainer.appendChild(typingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) indicator.remove();
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        async function sendChatMessage() {
             const input = document.getElementById('chat-input');
             const message = input.value.trim();
             if (!message) return;
             
             const messagesContainer = document.getElementById('chat-messages');
             
-            // Add user message
-            const userMsg = document.createElement('div');
-            userMsg.className = 'message user';
-            userMsg.textContent = message;
-            messagesContainer.appendChild(userMsg);
+            const userMsgDiv = document.createElement('div');
+            userMsgDiv.className = 'message user';
+            userMsgDiv.innerHTML = `<div class="message-content">${escapeHtml(message)}</div>`;
+            messagesContainer.appendChild(userMsgDiv);
             
-            // Simple bot response
-            const botMsg = document.createElement('div');
-            botMsg.className = 'message bot';
-            botMsg.textContent = "Thanks for your interest! Please visit our inventory page to see available vehicles or contact our showroom for assistance.";
-            messagesContainer.appendChild(botMsg);
-            
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
             input.value = '';
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            addTypingIndicator();
+            
+            try {
+                const response = await fetch('http://localhost:5001/api/chatbot', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: message,
+                        user_id: window.currentUser ? window.currentUser.id : null
+                    })
+                });
+                
+                const data = await response.json();
+                removeTypingIndicator();
+                
+                const botMsgDiv = document.createElement('div');
+                botMsgDiv.className = 'message bot';
+                botMsgDiv.innerHTML = `<div class="message-content">${escapeHtml(data.response)}</div>`;
+                messagesContainer.appendChild(botMsgDiv);
+                
+                if (data.vehicles && data.vehicles.length > 0) {
+                    const vehicleSuggestions = document.createElement('div');
+                    vehicleSuggestions.className = 'message bot';
+                    let vehicleHtml = '<div class="message-content"><small>🚗 Related vehicles:</small><br>';
+                    data.vehicles.slice(0, 2).forEach(v => {
+                        vehicleHtml += `<a href="vehicle-details.html?id=${v.id}" style="color: #3b82f6; text-decoration: none; display: inline-block; margin-top: 5px;">${v.year} ${v.make} ${v.model} - KSh ${v.price.toLocaleString()}</a><br>`;
+                    });
+                    vehicleHtml += '</div>';
+                    vehicleSuggestions.innerHTML = vehicleHtml;
+                    messagesContainer.appendChild(vehicleSuggestions);
+                }
+                
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                
+            } catch (error) {
+                console.error('Chat error:', error);
+                removeTypingIndicator();
+                const errorMsgDiv = document.createElement('div');
+                errorMsgDiv.className = 'message bot';
+                errorMsgDiv.innerHTML = '<div class="message-content">Sorry, I\'m having trouble connecting. Please try again!</div>';
+                messagesContainer.appendChild(errorMsgDiv);
+            }
         }
+        
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendChatMessage();
+            }
+        }
+        
+        // ============= END CHATBOT FUNCTIONS =============
         
         // Update UI based on logged in user
         function updateUIForLoggedInUser() {
@@ -360,10 +837,8 @@
             const authContainer = document.getElementById('authLinkContainer');
             const ordersNav = document.getElementById('ordersNav');
             const adminNav = document.getElementById('adminNavigation');
-            const cartLink = document.querySelector('.nav-links a[href="cart.html"]');
             
             if (window.currentUser) {
-                // User is logged in
                 if (authContainer) {
                     authContainer.innerHTML = `
                         <div class="user-menu-container">
@@ -377,54 +852,35 @@
                         </div>
                     `;
                 }
-                
-                // Show My Orders for all logged in users (customers and admins)
-                if (ordersNav) {
-                    ordersNav.style.display = 'block';
-                }
-                
-                // Show Admin Dashboard only for admin users
+                if (ordersNav) ordersNav.style.display = 'block';
                 if (adminNav && window.currentUser.role === 'admin') {
                     adminNav.style.display = 'block';
                 } else if (adminNav) {
                     adminNav.style.display = 'none';
                 }
                 
-                // Update cart count display if cart exists
                 const savedCart = localStorage.getItem('cart');
                 if (savedCart) {
                     try {
                         const cart = JSON.parse(savedCart);
                         const cartCountSpan = document.getElementById('cartCount');
-                        if (cartCountSpan) {
-                            cartCountSpan.innerText = cart.length;
-                        }
+                        if (cartCountSpan) cartCountSpan.innerText = cart.length;
                     } catch(e) {}
                 }
             } else {
-                // User is not logged in
-                if (authContainer) {
-                    authContainer.innerHTML = `<a href="login.html" class="login-btn">Login</a>`;
-                }
-                if (ordersNav) {
-                    ordersNav.style.display = 'none';
-                }
-                if (adminNav) {
-                    adminNav.style.display = 'none';
-                }
+                if (authContainer) authContainer.innerHTML = `<a href="login.html" class="login-btn">Login</a>`;
+                if (ordersNav) ordersNav.style.display = 'none';
+                if (adminNav) adminNav.style.display = 'none';
             }
         }
         
-        // Handle logout
         function handleLogout() {
             localStorage.removeItem('currentUser');
             localStorage.removeItem('cart');
             window.currentUser = null;
-            // Refresh the page to reset UI
             window.location.href = 'index.html';
         }
         
-        // Load cart count from localStorage
         function loadCartCount() {
             const savedCart = localStorage.getItem('cart');
             const cartCountSpan = document.getElementById('cartCount');
@@ -438,7 +894,6 @@
             }
         }
         
-        // Load spotlight vehicles
         async function loadSpotlightVehicles() {
             try {
                 const response = await fetch('http://localhost:5001/api/recommendations', {
@@ -455,22 +910,21 @@
                     const value = sorted[sorted.length - 1];
 
                     document.getElementById('spotlightArea').innerHTML = `
-                        <div class="spotlight-card">
+                        <div class="spotlight-card" onclick="window.location.href='vehicle-details.html?id=${luxury.id}'">
                             <span class="badge luxury">The Pinnacle</span>
                             <img src="${luxury.image_url || 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=500'}" class="spotlight-img">
                             <div class="spotlight-info">
                                 <h3 style="margin: 0;">${luxury.year} ${luxury.make} ${luxury.model}</h3>
-                                <p style="color: #fbbf24; font-weight: 800; font-size: 1.5rem; margin: 10px 0;">$${Number(luxury.price).toLocaleString()}</p>
+                                <p style="color: #fbbf24; font-weight: 800; font-size: 1.5rem; margin: 10px 0;">KES ${Number(luxury.price).toLocaleString()}</p>
                                 <small style="color: var(--text-gray)">Refined Engineering & Pure Performance</small>
                             </div>
                         </div>
-
-                        <div class="spotlight-card">
+                        <div class="spotlight-card" onclick="window.location.href='vehicle-details.html?id=${value.id}'">
                             <span class="badge value">Best Value</span>
                             <img src="${value.image_url || 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=500'}" class="spotlight-img">
                             <div class="spotlight-info">
                                 <h3 style="margin: 0;">${value.year} ${value.make} ${value.model}</h3>
-                                <p style="color: var(--accent-blue); font-weight: 800; font-size: 1.5rem; margin: 10px 0;">$${Number(value.price).toLocaleString()}</p>
+                                <p style="color: var(--accent-blue); font-weight: 800; font-size: 1.5rem; margin: 10px 0;">KES ${Number(value.price).toLocaleString()}</p>
                                 <small style="color: var(--text-gray)">Optimal Quality for Smart Investment</small>
                             </div>
                         </div>
@@ -481,34 +935,27 @@
                         viewAllBtn.textContent = `View Full Inventory (${vehicles.length} Available)`;
                     }
                 } else {
-                    document.getElementById('spotlightArea').innerHTML = `
-                        <div style="width: 100%; text-align: center; padding: 50px; color: var(--text-gray);">
-                            <p>No vehicles currently available. Check back soon!</p>
-                        </div>
-                    `;
+                    document.getElementById('spotlightArea').innerHTML = `<div style="width: 100%; text-align: center; padding: 50px; color: var(--text-gray);"><p>No vehicles currently available. Check back soon!</p></div>`;
                 }
             } catch (err) {
                 console.error("Spotlight fetch failed:", err);
-                document.getElementById('spotlightArea').innerHTML = `
-                    <div style="width: 100%; text-align: center; padding: 50px; color: var(--text-gray);">
-                        <p>Unable to load inventory. Please ensure the server is running.</p>
-                    </div>
-                `;
+                document.getElementById('spotlightArea').innerHTML = `<div style="width: 100%; text-align: center; padding: 50px; color: var(--text-gray);"><p>Unable to load inventory. Please ensure the server is running.</p></div>`;
             }
         }
         
         // Initialize the page
         document.addEventListener('DOMContentLoaded', async () => {
-            // Update UI based on logged in user
             updateUIForLoggedInUser();
-            
-            // Load cart count
             loadCartCount();
-            
-            // Load spotlight vehicles
             await loadSpotlightVehicles();
+            await loadAllVehicles();
             
-            // Listen for storage changes (in case user logs in/out in another tab)
+            // Setup quick search form
+            const quickSearchForm = document.getElementById('quickSearchForm');
+            if (quickSearchForm) {
+                quickSearchForm.addEventListener('submit', performQuickSearch);
+            }
+            
             window.addEventListener('storage', function(e) {
                 if (e.key === 'currentUser') {
                     updateUIForLoggedInUser();
@@ -522,22 +969,48 @@
         
         // Make functions globally accessible
         window.toggleChat = toggleChat;
+        window.closeChat = closeChat;
         window.sendChatMessage = sendChatMessage;
+        window.sendSuggestion = sendSuggestion;
+        window.handleKeyPress = handleKeyPress;
         window.handleLogout = handleLogout;
         window.toggleSearch = toggleSearch;
         window.updateUIForLoggedInUser = updateUIForLoggedInUser;
+        window.viewVehicleDetails = viewVehicleDetails;
+        window.clearQuickResults = clearQuickResults;
+        window.goToAdvancedSearch = goToAdvancedSearch;
+        window.performQuickSearch = performQuickSearch;
     </script>
     
     <!-- Chat Widget -->
     <div id="chat-container">
         <div id="chat-window" class="hidden">
-            <div id="chat-header">DriveSelect AI Assistant</div>
+            <div id="chat-header">
+                <div class="chat-title">
+                    <i class="fas fa-robot"></i>
+                    <span>DriveSelect AI Assistant</span>
+                </div>
+                <button id="close-chat" onclick="closeChat()">✕</button>
+            </div>
             <div id="chat-messages">
-                <div class="message bot">Hello! Welcome to DriveSelect. How can I help you today?</div>
+                <div class="message bot">
+                    <div class="message-content">
+                        👋 Hi! I'm DriveSelect AI.<br>
+                        Ask me about:<br>
+                        • Vehicle availability & pricing<br>
+                        • M-Pesa payment process<br>
+                        • Warranties & financing<br>
+                        • Test drives & more!
+                    </div>
+                </div>
+            </div>
+            <div class="suggestions-container" id="suggestionsContainer">
+                <span class="suggestion-chip" onclick="sendSuggestion('What vehicles do you have?')">What vehicles do you have?</span>
+                <span class="suggestion-chip" onclick="sendSuggestion('How does M-Pesa payment work?')">How does M-Pesa work?</span>
             </div>
             <div class="chat-input-box">
-                <input type="text" id="chat-input" placeholder="Ask about our cars...">
-                <button onclick="sendChatMessage()">Send</button>
+                <input type="text" id="chat-input" placeholder="Ask me anything..." onkeypress="handleKeyPress(event)">
+                <button onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
         <button id="chat-toggle-btn" onclick="toggleChat()">💬 Help</button>

@@ -137,18 +137,18 @@
                         ${v.status.toUpperCase()}
                     </span>
                     <h1 style="margin:10px 0;">${v.year} ${v.make} ${v.model}</h1>
-                    <div class="price-tag">$${Number(v.price).toLocaleString()}</div>
+                    <div class="price-tag">KSh${Number(v.price).toLocaleString()}</div>
                     
                     <div class="tax-info">
                         <div style="display:flex; justify-content:space-between">
-                            <span>Base Price:</span> <span>$${Number(v.price).toLocaleString()}</span>
+                            <span>Base Price:</span> <span>KSh${Number(v.price).toLocaleString()}</span>
                         </div>
                         <div style="display:flex; justify-content:space-between; margin-top:5px;">
-                            <span>Est. Sales Tax (5%):</span> <span>$${tax.toLocaleString()}</span>
+                            <span>Est. Sales Tax (5%):</span> <span>KSh${tax.toLocaleString()}</span>
                         </div>
                         <hr style="opacity:0.1; margin:10px 0;">
                         <div style="display:flex; justify-content:space-between; font-weight:bold; color:white">
-                            <span>Total Price:</span> <span>$${total.toLocaleString()}</span>
+                            <span>Total Price:</span> <span>KSh${total.toLocaleString()}</span>
                         </div>
                     </div>
 
@@ -159,11 +159,19 @@
                         <div class="spec-item"><span class="spec-label">Transmission</span><strong>${v.transmission}</strong></div>
                     </div>
 
-                    ${v.status === 'available' ? 
-                        `<button class="btn-buy-now" onclick="initiatePurchase(${v.id}, 'stripe')">Proceed to Checkout</button>
-                         <button class="btn-buy-now" style="background:#10b981; margin-top:10px;" onclick="initiatePurchase(${v.id}, 'manual')">Pay with Cash</button>` 
-                        : '<button class="btn-buy-now" style="background:#334155" disabled>Sold Out</button>'
-                    }
+                    // Inside your rendering function
+${v.status === 'available' ? `
+    <button class="btn-buy-now" 
+        onclick="initiatePurchase(${v.id}, ${v.price}, 'mpesa')">
+        Proceed to M-Pesa
+    </button>
+    <button class="btn-buy-now" 
+        style="background:#10b981; margin-top:10px;" 
+        onclick="initiatePurchase(${v.id}, ${v.price}, 'cash')">
+        Pay with Cash
+    </button>` 
+    : '<button class="btn-buy-now" style="background:#334155" disabled>Sold Out</button>'
+}
                 </div>
             `;
         }

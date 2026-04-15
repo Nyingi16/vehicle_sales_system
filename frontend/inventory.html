@@ -3,175 +3,861 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventory | DriveSelect AI</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>Showroom | DriveSelect AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* --- CSS RESET & BASE --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         :root {
             --dark-bg: #0f172a;
             --card-bg: #1e293b;
             --accent-blue: #3b82f6;
             --text-gray: #94a3b8;
-            --glass: rgba(15, 23, 42, 0.9);
+            --glass: rgba(15, 23, 42, 0.95);
+            --border: rgba(255, 255, 255, 0.08);
+            --danger: #ef4444;
+            --success-green: #10b981;
         }
 
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: var(--dark-bg); 
-            color: white; 
-            margin: 0;
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark-bg);
+            color: #f1f5f9;
+            line-height: 1.5;
+            overflow-x: hidden;
         }
 
-        /* --- NAVBAR --- */
+        /* --- PROFESSIONAL NAVBAR --- */
         .navbar {
-            position: sticky; top: 0; z-index: 1000;
+            position: sticky; 
+            top: 0; 
+            z-index: 1000;
             background: var(--glass);
             backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            display: flex; justify-content: space-between;
-            align-items: center; padding: 1rem 5%;
+            border-bottom: 1px solid var(--border);
+            display: flex; 
+            justify-content: space-between;
+            align-items: center; 
+            padding: 1rem 5%;
         }
-        .logo { font-weight: 800; font-size: 1.5rem; letter-spacing: -1px; cursor: pointer; }
-        .logo span { color: var(--accent-blue); }
-        .nav-links { display: flex; align-items: center; gap: 2rem; list-style: none; margin: 0; padding: 0; }
-        .nav-links a { text-decoration: none; color: white; font-weight: 500; font-size: 0.9rem; transition: 0.3s; cursor: pointer; }
 
-        /* --- HEADER --- */
-        .inventory-header {
-            padding: 60px 5% 20px;
+        .logo {
+            font-weight: 800;
+            font-size: 1.5rem;
+            text-decoration: none;
+            color: white;
+            cursor: pointer;
+        }
+
+        .logo span {
+            color: var(--accent-blue);
+        }
+
+        .nav-links { 
+            display: flex; 
+            gap: 2rem; 
+            align-items: center; 
+            flex-wrap: wrap;
+        }
+
+        .nav-links a { 
+            color: white; 
+            text-decoration: none; 
+            font-weight: 500; 
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { 
+            color: var(--accent-blue); 
+        }
+
+        .cart-icon { 
+            position: relative; 
+        }
+        
+        #cartCount {
+            position: absolute; 
+            top: -10px; 
+            right: -15px;
+            background: var(--accent-blue); 
+            color: white;
+            font-size: 0.7rem; 
+            padding: 2px 7px; 
+            border-radius: 50%;
+            font-weight: 700;
+        }
+
+        /* Login Button */
+        .login-btn {
+            background: var(--accent-blue);
+            padding: 8px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .login-btn:hover {
+            background: #2563eb;
+            color: white !important;
+        }
+
+        /* User Dropdown */
+        .user-menu {
+            position: relative;
+        }
+
+        .user-dropdown-btn {
+            background: var(--accent-blue);
+            padding: 8px 20px;
+            border-radius: 8px;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .user-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 45px;
+            background: var(--card-bg);
+            min-width: 180px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1000;
+        }
+
+        .user-dropdown a {
+            display: block;
+            padding: 12px 16px;
+            color: white;
+            text-decoration: none;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .user-dropdown a:hover {
+            background: var(--accent-blue);
+        }
+
+        .user-dropdown a:last-child {
+            border-bottom: none;
+            color: var(--danger);
+        }
+
+        .user-menu:hover .user-dropdown {
+            display: block;
+        }
+
+        /* --- SHOWROOM HEADER --- */
+        .showroom-header {
+            padding: 4rem 5% 2rem;
             max-width: 1400px;
             margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
+            text-align: center;
         }
 
-        .btn-advanced-search {
-            background: rgba(59, 130, 246, 0.1);
-            color: var(--accent-blue);
-            padding: 12px 24px;
-            border-radius: 8px;
-            text-decoration: none;
-            border: 1px solid var(--accent-blue);
-            font-weight: 600;
-            transition: 0.3s;
+        .showroom-header h1 { 
+            font-size: 2.8rem; 
+            font-weight: 800; 
+            margin-bottom: 1rem;
+            letter-spacing: -0.025em;
         }
-        .btn-advanced-search:hover {
+
+        .showroom-header h1 span {
+            color: var(--accent-blue);
+        }
+
+        .showroom-header p { 
+            color: var(--text-gray); 
+            max-width: 700px; 
+            margin: 0 auto;
+            font-size: 1.1rem; 
+        }
+
+        /* --- INVENTORY CONTAINER --- */
+        .inventory-container {
+            padding: 2rem 5% 3rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 2x6 GRID: 2 columns horizontally, 6 rows vertically = 12 cards */
+        #recommendationsContainer {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        /* --- COMPACT VEHICLE CARD --- */
+        .vehicle-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: row;
+            cursor: pointer;
+            height: auto;
+            min-height: 180px;
+        }
+
+        .vehicle-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent-blue);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Image Container - Fixed width */
+        .vehicle-image-container {
+            width: 180px;
+            flex-shrink: 0;
+            overflow: hidden;
+            background: #0f172a;
+        }
+
+        .vehicle-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .vehicle-card:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Card Content - Compact */
+        .card-meta {
+            padding: 12px 15px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-header {
+            margin-bottom: 8px;
+        }
+
+        .card-header h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin: 0 0 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .price {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--accent-blue);
+            margin: 4px 0;
+        }
+
+        .specs {
+            display: flex;
+            gap: 12px;
+            font-size: 0.7rem;
+            color: var(--text-gray);
+            margin: 8px 0;
+            flex-wrap: wrap;
+        }
+
+        .specs span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .description-preview {
+            font-size: 0.7rem;
+            color: var(--text-gray);
+            margin: 6px 0;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Button Group */
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .btn-view, .btn-cart, .btn-cash {
+            flex: 1;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.7rem;
+            text-align: center;
+            border: none;
+        }
+
+        .btn-view {
             background: var(--accent-blue);
             color: white;
         }
 
-        /* --- GRID --- */
-        .inventory-section { padding: 20px 5% 60px; max-width: 1400px; margin: 0 auto; }
-        #recommendationsContainer { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
-            gap: 30px; 
+        .btn-view:hover {
+            background: #2563eb;
         }
 
-        /* --- PAGINATION --- */
+        .btn-cart {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            border: 1px solid var(--accent-blue);
+        }
+
+        .btn-cart:hover:not(:disabled) {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-cart:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-cash {
+            background: var(--success-green);
+            color: white;
+        }
+
+        .btn-cash:hover {
+            background: #059669;
+        }
+
+        /* --- PAGINATION CONTROLS - HORIZONTAL AT BOTTOM --- */
         .pagination-wrapper {
+            margin-top: 20px;
+            margin-bottom: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 10px;
-            margin-top: 50px;
-            padding-bottom: 60px;
+            gap: 15px;
+            flex-wrap: wrap;
         }
 
         .page-btn {
             background: var(--card-bg);
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid var(--border);
             color: white;
-            padding: 10px 18px;
+            padding: 10px 20px;
             border-radius: 8px;
             cursor: pointer;
-            transition: 0.3s;
             font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
         }
 
         .page-btn:hover:not(:disabled) {
+            background: var(--accent-blue);
             border-color: var(--accent-blue);
-            color: var(--accent-blue);
+            transform: translateY(-2px);
         }
 
-        .page-btn.active {
+        .page-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .pagination-numbers {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .page-number {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: white;
+            min-width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .page-number:hover {
             background: var(--accent-blue);
             border-color: var(--accent-blue);
         }
 
-        .page-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
+        .page-number.active {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
         }
 
+        .page-ellipsis {
+            color: var(--text-gray);
+            display: flex;
+            align-items: center;
+            padding: 0 5px;
+        }
+
+        /* Page Info */
+        .page-info {
+            text-align: center;
+            margin-top: 15px;
+            margin-bottom: 30px;
+            color: var(--text-gray);
+            font-size: 0.85rem;
+        }
+
+        /* Loading State */
+        .loading-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-gray);
+            grid-column: 1 / -1;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(59, 130, 246, 0.2);
+            border-top-color: var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            grid-column: 1 / -1;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .empty-state p {
+            color: var(--text-gray);
+        }
+
+        /* Mobile: Single column */
         @media (max-width: 768px) {
-            .inventory-header { flex-direction: column; align-items: flex-start; gap: 20px; }
+            #recommendationsContainer {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .showroom-header h1 { 
+                font-size: 2rem; 
+            }
+            
+            .navbar {
+                padding: 0.8rem 5%;
+            }
+            
+            .nav-links {
+                gap: 0.8rem;
+            }
+            
+            .nav-links a {
+                font-size: 0.8rem;
+            }
+            
+            .login-btn {
+                padding: 6px 16px;
+            }
+            
+            .pagination-wrapper {
+                gap: 8px;
+            }
+            
+            .page-btn {
+                padding: 8px 14px;
+                font-size: 0.75rem;
+            }
+            
+            .page-number {
+                min-width: 34px;
+                height: 34px;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Tablet: Keep 2 columns */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            #recommendationsContainer {
+                gap: 18px;
+            }
+            
+            .vehicle-image-container {
+                width: 150px;
+            }
+            
+            .card-meta {
+                padding: 10px 12px;
+            }
         }
     </style>
 </head>
 <body>
 
     <nav class="navbar">
-        <div class="logo" onclick="window.location.href='index.html'">DRIVE<span>SELECT</span></div>
-        <ul class="nav-links">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="inventory.html" style="color: var(--accent-blue);">Inventory</a></li>
-            <li><a href="cart.html">Cart (<span id="cartCount">0</span>)</a></li>
-            <li id="authLinkContainer"></li>
-        </ul>
+        <div class="logo" onclick="window.location.href='index.html'">
+            <span style="color: var(--accent-blue);">Drive</span>Select
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="inventory.html" style="color: var(--accent-blue);">Inventory</a>
+            <a href="search.html">Search</a>
+            <a href="cart.html" class="cart-icon">
+                Cart <span id="cartCount">0</span>
+            </a>
+            <div id="authContainer">
+                <a href="login.html" class="login-btn">Login</a>
+            </div>
+        </div>
     </nav>
 
-    <header class="inventory-header">
-        <div>
-            <h1 style="font-size: 2.5rem; font-weight: 800; margin: 0;">Showroom <span style="color: var(--accent-blue);">Inventory</span></h1>
-            <p style="color: var(--text-gray); margin-top: 10px;">Explore our curated collection of high-performance vehicles.</p>
-        </div>
-        <a href="search.html" class="btn-advanced-search">Advanced AI Search →</a>
+    <header class="showroom-header">
+        <h1>Digital <span>Showroom</span></h1>
+        <p>Explore Kenya's most reliable inventory. Every vehicle is integrated with our AI verification system for maximum security and peace of mind.</p>
     </header>
 
-    <main class="inventory-section">
+    <main class="inventory-container">
         <div id="recommendationsContainer">
-            <div style="grid-column: 1/-1; text-align: center; padding: 100px;">
-                <p style="color: var(--text-gray);">Syncing with DriveSelect Database...</p>
+            <div class="loading-state">
+                <div class="loading-spinner"></div>
+                <p>Loading inventory...</p>
             </div>
         </div>
 
-        <div id="paginationControls" class="pagination-wrapper">
-            </div>
+        <!-- Pagination Controls - Horizontally at Bottom -->
+        <div id="paginationControls" class="pagination-wrapper"></div>
+        <div id="pageInfo" class="page-info"></div>
     </main>
 
     <script src="js/main.js"></script>
+    
     <script>
+        // Global state
+        let currentUser = null;
+        let allVehicles = [];
+        let currentPage = 1;
+        let itemsPerPage = 12; // 2 columns x 6 rows = 12 vehicles
+        let cart = [];
+
+        // Load cart from localStorage
+        function loadCart() {
+            const savedCart = localStorage.getItem('cart');
+            if (savedCart) {
+                try {
+                    cart = JSON.parse(savedCart);
+                } catch(e) {
+                    cart = [];
+                }
+            }
+            updateCartUI();
+        }
+
+        // Save cart
+        function saveCart() {
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartUI();
+        }
+
+        // Update cart count display
+        function updateCartUI() {
+            const countEl = document.getElementById('cartCount');
+            if (countEl) {
+                countEl.innerText = cart.length;
+            }
+        }
+
+        // Update auth UI
+        function updateAuthUI() {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                const authContainer = document.getElementById('authContainer');
+                if (authContainer && currentUser) {
+                    authContainer.innerHTML = `
+                        <div class="user-menu">
+                            <button class="user-dropdown-btn">
+                                <i class="fas fa-user-circle"></i> ${currentUser.username}
+                            </button>
+                            <div class="user-dropdown">
+                                <a href="purchase-confirmation.html"><i class="fas fa-shopping-bag"></i> My Orders</a>
+                                <a href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('cart');
+            window.location.href = 'index.html';
+        }
+
+        // Load vehicles from API
+        async function loadVehicles() {
+            try {
+                const response = await fetch('http://localhost:5001/api/vehicles');
+                if (!response.ok) throw new Error('Failed to load vehicles');
+                allVehicles = await response.json();
+                renderInventoryPage(1);
+            } catch (error) {
+                console.error('Error loading vehicles:', error);
+                const container = document.getElementById('recommendationsContainer');
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Unable to Load Inventory</h3>
+                        <p>Please ensure the server is running on port 5001</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Check if vehicle is in cart
+        function isInCart(vehicleId) {
+            return cart.some(item => item.id === vehicleId);
+        }
+
+        // Add to cart
+        async function addToCart(vehicleId) {
+            if (!currentUser) {
+                alert("Please login to add items to your cart.");
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            if (isInCart(vehicleId)) {
+                alert("This vehicle is already in your cart.");
+                return;
+            }
+            
+            try {
+                const response = await fetch(`http://localhost:5001/api/vehicles/${vehicleId}`);
+                if (!response.ok) throw new Error('Vehicle not found');
+                const vehicle = await response.json();
+                
+                cart.push(vehicle);
+                saveCart();
+                alert(`${vehicle.make} ${vehicle.model} added to cart!`);
+                
+                renderInventoryPage(currentPage);
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                alert('Could not add vehicle to cart.');
+            }
+        }
+
+        // Initiate purchase
+        function initiatePurchase(vehicleId, method) {
+            if (!currentUser) {
+                alert("Please login to make a purchase");
+                window.location.href = 'login.html';
+                return;
+            }
+            window.location.href = `vehicle-details.html?id=${vehicleId}`;
+        }
+
+        // View vehicle details
+        function viewVehicleDetails(vehicleId) {
+            window.location.href = `vehicle-details.html?id=${vehicleId}`;
+        }
+
+        // Render inventory page
+        function renderInventoryPage(page) {
+            if (!allVehicles || allVehicles.length === 0) {
+                const container = document.getElementById('recommendationsContainer');
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-car"></i>
+                        <h3>No Vehicles Available</h3>
+                        <p>Check back soon for new inventory!</p>
+                    </div>
+                `;
+                document.getElementById('paginationControls').innerHTML = '';
+                document.getElementById('pageInfo').innerHTML = '';
+                return;
+            }
+
+            currentPage = page;
+            const totalPages = Math.ceil(allVehicles.length / itemsPerPage);
+            const start = (currentPage - 1) * itemsPerPage;
+            const pageVehicles = allVehicles.slice(start, start + itemsPerPage);
+
+            // Render vehicles in 2x6 grid
+            const container = document.getElementById('recommendationsContainer');
+            container.innerHTML = pageVehicles.map(vehicle => {
+                const inCart = isInCart(vehicle.id);
+                const carImage = vehicle.image_url || 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=500';
+                
+                return `
+                    <div class="vehicle-card">
+                        <div class="vehicle-image-container" onclick="viewVehicleDetails(${vehicle.id})">
+                            <img src="${carImage}" alt="${vehicle.make} ${vehicle.model}" loading="lazy">
+                        </div>
+                        <div class="card-meta">
+                            <div class="card-header">
+                                <h4 onclick="viewVehicleDetails(${vehicle.id})">${vehicle.year} ${vehicle.make} ${vehicle.model}</h4>
+                                <p class="price">KSh ${Number(vehicle.price).toLocaleString()}</p>
+                            </div>
+                            <div class="specs">
+                                <span><i class="fas fa-tachometer-alt"></i> ${(vehicle.mileage || 0).toLocaleString()} mi</span>
+                                <span><i class="fas fa-gas-pump"></i> ${vehicle.fuel_type || 'N/A'}</span>
+                                <span><i class="fas fa-cogs"></i> ${vehicle.transmission || 'N/A'}</span>
+                            </div>
+                            <div class="description-preview">
+                                ${vehicle.description ? vehicle.description.substring(0, 80) + '...' : 'No description available.'}
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn-view" onclick="viewVehicleDetails(${vehicle.id})">
+                                    <i class="fas fa-info-circle"></i> Details
+                                </button>
+                                ${currentUser ? 
+                                    `<button class="btn-cart" onclick="addToCart(${vehicle.id})" ${inCart ? 'disabled' : ''}>
+                                        <i class="fas fa-cart-plus"></i> ${inCart ? 'In Cart' : 'Cart'}
+                                     </button>
+                                     <button class="btn-cash" onclick="initiatePurchase(${vehicle.id}, 'mpesa')">
+                                        <i class="fas fa-mobile-alt"></i> Buy
+                                     </button>` : 
+                                    `<button class="btn-view" onclick="window.location.href='login.html'">
+                                        <i class="fas fa-lock"></i> Login
+                                     </button>`
+                                }
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Render pagination controls horizontally at bottom
+            renderPagination(totalPages);
+            
+            // Render page info
+            const pageInfo = document.getElementById('pageInfo');
+            const startNum = start + 1;
+            const endNum = Math.min(start + itemsPerPage, allVehicles.length);
+            pageInfo.innerHTML = `Showing ${startNum} - ${endNum} of ${allVehicles.length} vehicles`;
+        }
+
+        // Render pagination controls - Horizontal layout
+        function renderPagination(totalPages) {
+            const paginationContainer = document.getElementById('paginationControls');
+            
+            if (totalPages <= 1) {
+                paginationContainer.innerHTML = '';
+                return;
+            }
+
+            let html = `
+                <button class="page-btn" onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-left"></i> Prev
+                </button>
+                <div class="pagination-numbers">
+            `;
+
+            const maxVisible = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+            if (endPage - startPage + 1 < maxVisible) {
+                startPage = Math.max(1, endPage - maxVisible + 1);
+            }
+
+            if (startPage > 1) {
+                html += `<div class="page-number" onclick="goToPage(1)">1</div>`;
+                if (startPage > 2) html += `<span class="page-ellipsis">...</span>`;
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                html += `<div class="page-number ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</div>`;
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) html += `<span class="page-ellipsis">...</span>`;
+                html += `<div class="page-number" onclick="goToPage(${totalPages})">${totalPages}</div>`;
+            }
+
+            html += `
+                </div>
+                <button class="page-btn" onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                    Next <i class="fas fa-chevron-right"></i>
+                </button>
+            `;
+
+            paginationContainer.innerHTML = html;
+        }
+
+        // Go to specific page
+        function goToPage(page) {
+            if (page < 1 || page > Math.ceil(allVehicles.length / itemsPerPage)) return;
+            currentPage = page;
+            renderInventoryPage(currentPage);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Initialize page
         document.addEventListener('DOMContentLoaded', () => {
-            // Update Auth UI
-            if (typeof updateUIForLoggedInUser === 'function') updateUIForLoggedInUser();
-            
-            // Set pagination limit to 10 for this specific page
-            window.itemsPerPage = 10;
-            
-            // Initial Load
-            loadAvailableStock();
+            loadCart();
+            updateAuthUI();
+            loadVehicles();
         });
 
-        // Function to handle rendering the specific grid items for this page
-        // (This works in sync with the logic added to your main.js)
-        function renderInventoryGrid(pagedVehicles) {
-            const container = document.getElementById('recommendationsContainer');
-            container.innerHTML = pagedVehicles.map(v => `
-                <div class="vehicle-card" onclick="viewVehicleDetails(${v.id})">
-                    <img src="${v.image_url || 'https://via.placeholder.com/400x250'}" alt="${v.make}">
-                    <div class="card-meta">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                            <h4>${v.year} ${v.make} ${v.model}</h4>
-                        </div>
-                        <p class="price">$${Number(v.price).toLocaleString()}</p>
-                        <p class="specs">${v.fuel_type} • ${v.transmission} • ${v.mileage.toLocaleString()} mi</p>
-                        <button class="btn-buy" onclick="event.stopPropagation(); addToCart(${JSON.stringify(v).replace(/"/g, '&quot;')})">Add to Cart</button>
-                    </div>
-                </div>
-            `).join('');
-        }
+        // Make functions global
+        window.viewVehicleDetails = viewVehicleDetails;
+        window.goToPage = goToPage;
+        window.handleLogout = handleLogout;
+        window.addToCart = addToCart;
+        window.initiatePurchase = initiatePurchase;
     </script>
 </body>
 </html>

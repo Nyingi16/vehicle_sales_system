@@ -309,7 +309,7 @@
                     </div>
                     <div class="stat-card">
                         <div class="stat-label">Total Inventory Value</div>
-                        <h3 style="color: var(--success);">$${totalValue.toLocaleString()}</h3>
+                        <h3 style="color: var(--success);">KSh${totalValue.toLocaleString()}</h3>
                     </div>
                     <div class="stat-card">
                         <div class="stat-label">Sold Vehicles (All Time)</div>
@@ -337,7 +337,7 @@
                                     <td style="font-weight: 600;">${v.make}</td>
                                     <td>${v.model}</td>
                                     <td>${v.year}</td>
-                                    <td style="color: var(--success);">$${parseFloat(v.price).toLocaleString()}</td>
+                                    <td style="color: var(--success);">KSh${parseFloat(v.price).toLocaleString()}</td>
                                     <td>${v.fuel_type || 'N/A'}</td>
                                     <td>${v.transmission || 'N/A'}</td>
                                     <td><span class="status-pill">Available</span></td>
@@ -370,7 +370,7 @@
                 <div class="summary-stats">
                     <div class="stat-card">
                         <div class="stat-label">Total Portfolio Value</div>
-                        <h3 style="color: var(--success);">$${totalValue.toLocaleString()}</h3>
+                        <h3 style="color: var(--success);">KSh${totalValue.toLocaleString()}</h3>
                     </div>
                     <div class="stat-card">
                         <div class="stat-label">Active Unit Count</div>
@@ -378,7 +378,7 @@
                     </div>
                     <div class="stat-card">
                         <div class="stat-label">Average Unit Price</div>
-                        <h3>$${avgPrice.toLocaleString()}</h3>
+                        <h3>KSh${avgPrice.toLocaleString()}</h3>
                     </div>
                 </div>
                 <div style="overflow-x: auto;">
@@ -397,8 +397,8 @@
                                 <tr>
                                     <td style="font-weight: 500;">${v.make} ${v.model}</td>
                                     <td>${v.year}</td>
-                                    <td>$${parseFloat(v.price).toLocaleString()}</td>
-                                    <td>$${(v.price * 0.16).toLocaleString()}</td>
+                                    <td>KSh${parseFloat(v.price).toLocaleString()}</td>
+                                    <td>KSh${(v.price * 0.16).toLocaleString()}</td>
                                     <td style="font-weight: 600; color: var(--success);">$${(v.price * 1.16).toLocaleString()}</td>
                                 </tr>
                             `).join('')}
@@ -484,7 +484,7 @@
                         </div>
                         <div class="stat-card">
                             <div class="stat-label">Total Revenue</div>
-                            <h3 style="color: var(--success);">$${totalRevenue.toLocaleString()}</h3>
+                            <h3 style="color: var(--success);">KSh${totalRevenue.toLocaleString()}</h3>
                         </div>
                         <div class="stat-card">
                             <div class="stat-label">Verified Sales</div>
@@ -523,7 +523,7 @@
                                             <td>${vehicle ? vehicle.year : 'N/A'}</td>
                                             <td>${p.user_id}</td>
                                             <td class="customer-info">${p.user ? p.user.username : `User #${p.user_id}`}</td>
-                                            <td style="color: var(--success); font-weight: 600;">$${parseFloat(p.amount).toLocaleString()}</td>
+                                            <td style="color: var(--success); font-weight: 600;">KSh${parseFloat(p.amount).toLocaleString()}</td>
                                             <td><span class="status-pill">${p.payment_method === 'manual' ? 'Cash' : 'Card'}</span></td>
                                             <td><span class="${statusClass}">${verificationStatus}</span></td>
                                             <td>${new Date(p.created_at).toLocaleDateString()}</td>

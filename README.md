@@ -10,7 +10,7 @@ Before setting up the project, ensure you have:
 
 - Python **3.10+** installed  
 - OpenAI API Key (for chatbot functionality)  
-- Stripe API Keys (for payment processing)  
+- DARAJA API KEY (for payment processing)  
 - A static server (e.g., VS Code Live Server)
 
 ---

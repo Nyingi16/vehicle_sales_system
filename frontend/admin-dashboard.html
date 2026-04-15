@@ -117,7 +117,7 @@
                         <input type="text" id="add_make" placeholder="Make (e.g. Toyota)" required>
                         <input type="text" id="add_model" placeholder="Model (e.g. Camry)" required>
                         <input type="number" id="add_year" placeholder="Year" required>
-                        <input type="number" id="add_price" placeholder="Price (USD)" required>
+                        <input type="number" id="add_price" placeholder="Price (KSh)" required>
                         <input type="text" id="add_fuel" placeholder="Fuel Type (e.g. Petrol)">
                         <input type="text" id="add_transmission" placeholder="Transmission">
                         <input type="number" id="add_mileage" placeholder="Mileage">
@@ -194,88 +194,83 @@
         }
         
         // Load pending cash payments for verification
-        async function loadPendingPayments() {
-            const container = document.getElementById('adminPendingPayments');
-            if (!container) return;
+       async function loadPendingPayments() {
+    const container = document.getElementById('adminPendingPayments');
+    if (!container) return;
 
-            // Ensure we have currentUser from main.js
-            if (!window.currentUser) {
-                const saved = localStorage.getItem('currentUser');
-                if (saved) window.currentUser = JSON.parse(saved);
-            }
-            
-            if (!window.currentUser || window.currentUser.role !== 'admin') {
-                container.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--danger-red);">Admin authentication required</td></tr>';
-                return;
-            }
+    // Ensure we have currentUser from main.js
+    if (!window.currentUser) {
+        const saved = localStorage.getItem('currentUser');
+        if (saved) window.currentUser = JSON.parse(saved);
+    }
+    
+    if (!window.currentUser || window.currentUser.role !== 'admin') {
+        container.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--danger-red);">Admin authentication required</td></tr>';
+        return;
+    }
 
-            try {
-                // Append user_id to query string to pass admin_required check in app.py
-                const response = await fetch(`${API_BASE_URL}/admin/purchases?user_id=${window.currentUser.id}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                if (!response.ok) {
-                    if (response.status === 403) throw new Error('Unauthorized: Admin access required');
-                    if (response.status === 401) throw new Error('Authentication failed');
-                    throw new Error(`Server responded with ${response.status}`);
-                }
-                
-                const purchases = await response.json();
-                
-                // Filter for pending manual/cash payments awaiting admin approval
-                const pendingPayments = purchases.filter(p => 
-                    p.payment_status === 'PENDING_ADMIN_APPROVAL'
-                );
-                
-                if (pendingPayments.length === 0) {
-                    container.innerHTML = `
-                        <tr>
-                            <td colspan="5" style="text-align:center;">
-                                <div class="empty-state">
-                                    <i class="fas fa-check-circle"></i>
-                                    <p>No pending cash verifications</p>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                    return;
-                }
-                
-                // Display pending payments
-                container.innerHTML = pendingPayments.map(purchase => `
-                    <tr data-purchase-id="${purchase.id}">
-                        <td><strong>#${purchase.id}</strong></td>
-                        <td>${purchase.user_id || 'N/A'}</td>
-                        <td>${purchase.vehicle_name || `Vehicle #${purchase.vehicle_id}`}</td>
-                        <td><strong style="color: var(--success-green);">$${Number(purchase.amount).toLocaleString()}</strong></td>
-                        <td>
-                            <button class="btn-verify" onclick="verifyCashPayment(${purchase.id})">
-                                <i class="fas fa-check"></i> Verify Payment
-                            </button>
-                        </td>
-                    </tr>
-                `).join('');
-                
-            } catch (error) {
-                console.error('Error loading pending payments:', error);
-                container.innerHTML = `
-                    <tr>
-                        <td colspan="5" style="text-align:center;">
-                            <div class="empty-state">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <p>Error loading pending verifications</p>
-                                <small style="color: var(--danger-red);">${error.message}</small>
-                            </div>
-                        </td>
-                    </tr>
-                `;
+    try {
+        // Use the correct endpoint with user_id for admin auth
+        const response = await fetch(`${API_BASE_URL}/admin/pending-payments?user_id=${window.currentUser.id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
             }
+        });
+        
+        if (!response.ok) {
+            if (response.status === 403) throw new Error('Unauthorized: Admin access required');
+            if (response.status === 401) throw new Error('Authentication failed');
+            throw new Error(`Server responded with ${response.status}`);
         }
         
+        const pendingPayments = await response.json();
+        
+        if (!pendingPayments || pendingPayments.length === 0) {
+            container.innerHTML = `
+                <tr>
+                    <td colspan="5" style="text-align:center;">
+                        <div class="empty-state">
+                            <i class="fas fa-check-circle"></i>
+                            <p>No pending cash verifications</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        // Display pending payments
+        container.innerHTML = pendingPayments.map(purchase => `
+            <tr data-purchase-id="${purchase.id}">
+                <td><strong>#${purchase.id}</strong></td>
+                <td>${purchase.user || purchase.user_name || `User #${purchase.user_id}`}</td>
+                <td>${purchase.vehicle || purchase.vehicle_name || `Vehicle #${purchase.vehicle_id}`}</td>
+                <td><strong style="color: var(--success-green);">KSh${Number(purchase.amount).toLocaleString()}</strong></td>
+                <td>
+                    <button class="btn-verify" onclick="verifyCashPayment(${purchase.id})">
+                        <i class="fas fa-check"></i> Verify Payment
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+        
+    } catch (error) {
+        console.error('Error loading pending payments:', error);
+        container.innerHTML = `
+            <tr>
+                <td colspan="5" style="text-align:center;">
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Error loading pending verifications</p>
+                        <small style="color: var(--danger-red);">${error.message}</small>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }
+}
+              
         // Verify cash payment and mark vehicle as sold - NO CONFIRMATION DIALOG
         async function verifyCashPayment(purchaseId) {
             if (!window.currentUser || window.currentUser.role !== 'admin') {

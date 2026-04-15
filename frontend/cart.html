@@ -91,7 +91,7 @@
             <div id="cartSummary" class="summary-card">
                 <h3 style="margin-top:0;">Order Summary</h3>
                 <p style="color: var(--text-gray); margin-bottom: 0;">Grand Total</p>
-                <div class="total-price" id="totalPrice">$0</div>
+                <div class="total-price" id="totalPrice">KSh 0</div>
                 <button class="btn-checkout" onclick="checkout()">Proceed to Secure Checkout</button>
                 <button onclick="clearCart()" style="background:transparent; color: var(--text-gray); border:none; width:100%; margin-top:15px; cursor:pointer;">Clear All Items</button>
             </div>
@@ -129,14 +129,14 @@
                         <img src="${item.image_url || 'https://via.placeholder.com/150'}" alt="${item.make}">
                         <div class="item-info">
                             <h4>${item.year} ${item.make} ${item.model}</h4>
-                            <p>$${Number(item.price).toLocaleString()}</p>
+                            <p>KSh${Number(item.price).toLocaleString()}</p>
                         </div>
                         <button class="btn-remove" onclick="removeFromCart(${index})">Remove</button>
                     </div>
                 `;
             }).join('');
             
-            document.getElementById('totalPrice').innerText = `$${total.toLocaleString()}`;
+            document.getElementById('totalPrice').innerText = `KSh${total.toLocaleString()}`;
         }
 
         function removeFromCart(index) {
